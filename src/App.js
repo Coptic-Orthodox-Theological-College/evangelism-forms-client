@@ -6,13 +6,11 @@ import Home from './pages/Home';
 function App() {
   return (
     <Router>
-      <div className='custom-container'>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/home" element={<Home />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
+      </Routes>
     </Router>
   );
 }

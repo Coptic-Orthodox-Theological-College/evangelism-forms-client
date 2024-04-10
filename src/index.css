@@ -60,3 +60,16 @@ body {
   height: 100vh;
   background-color: #eee;
 }
+
+@media screen and (max-width: 768px) {
+  #radius-shape-1 {
+    display: none;
+  }
+  #radius-shape-2 {
+    display: none;
+  }
+
+  .custom-container-card {
+    width: 100%;
+  }
+}
