@@ -70,6 +70,13 @@ body {
   font-family: "Cairo", sans-serif !important;
 }
 
+.sign-in-error-message {
+  color: red;
+  font-size: 12px;
+  position: absolute;
+  margin-top: -20px;
+}
+
 @media screen and (max-width: 768px) {
   #radius-shape-1 {
     display: none;

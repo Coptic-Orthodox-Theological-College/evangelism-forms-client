@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MDBBtn, MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput, MDBCheckbox, MDBIcon } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
 import { openNotificationWithIcon } from '../utils/notification';
+import { login } from '../apis/user';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,39 +10,54 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
 
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     navigate('/home');
-  //   }
-  // }, [isAuthenticated]);
+  useEffect(() => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
+    setShowErrors(false);
   }
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
+    setShowErrors(false);
   }
 
   const handleRememberMeChange = (e) => {
     setRememberMe(e.target.checked);
   }
 
-  const handleLoginClick = () => {
-    console.log('username:', username);
-    if (username === '') {
-      openNotificationWithIcon('error', 'خطأ', 'الرجاء إدخال اسم المستخدم');
+  const handleLoginClick = async () => {
+    if (username === '' || password === '') {
+      setShowErrors(true);
       return;
     }
-    console.log('password:', password);
-    if (password === '') {
-      openNotificationWithIcon('error', 'خطأ', 'الرجاء إدخال كلمة المرور');
+
+    const response = await login(username, password);
+
+    if (!response.success) {
+      openNotificationWithIcon('error', 'خطأ', response.message);
       return;
     }
-    console.log('rememberMe:', rememberMe);
-    // setIsAuthenticated(true);
-    // navigate('/home');
+
+    if (rememberMe) {
+      localStorage.setItem('token', response.token);
+    } else {
+      sessionStorage.setItem('token', response.token);
+    }
+    setIsAuthenticated(true);
   }
 
   return (
@@ -58,7 +74,9 @@ const Login = () => {
                     width: '300px',
                   }} />
                 <h4 className='text-center mb-4'>تسجيل الدخول</h4>
+                {username === '' && showErrors && <span className='sign-in-error-message'>الرجاء إدخال اسم المستخدم</span>}
                 <MDBInput wrapperClass='mb-4' label='اسم المستخدم' id='form1' type='text' onChange={handleUsernameChange} />
+                {password === '' && showErrors && <span className='sign-in-error-message'>الرجاء إدخال كلمة المرور</span>}
                 <MDBInput wrapperClass='mb-2' label='كلمة المرور' id='form2' type='password' onChange={handlePasswordChange} />
                 <div dir='rtl' className='d-flex justify-content-center gap-2 mb-2'>
                   <MDBCheckbox id='checkbox1' onChange={handleRememberMeChange} />
