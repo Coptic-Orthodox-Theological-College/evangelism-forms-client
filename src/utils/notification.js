@@ -6,6 +6,10 @@ export const openNotificationWithIcon = (type, header, message) => {
     description: message,
   });
   notification.config({
-    duration: 10,
+    duration: 5,
+    rtl: true,
+    maxCount: 3,
+    closable: false,
+    placement: 'topRight',
   });
 };
