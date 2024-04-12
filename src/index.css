@@ -8,6 +8,21 @@ body {
   font-family: "Cairo", sans-serif !important;
 }
 
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #ebebeb;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffb347;
+}
+
 .background-radial-gradient {
   background-color: #204f7d;
   background-image: radial-gradient(
@@ -77,15 +92,30 @@ body {
   margin-top: -20px;
 }
 
-@media screen and (max-width: 768px) {
-  #radius-shape-1 {
-    display: none;
-  }
-  #radius-shape-2 {
-    display: none;
-  }
+.logout-btn {
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 120px;
+}
+.title-text {
+  color: #fff;
+  font-size: 3rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 2rem;
+}
 
-  .custom-container-card {
-    width: 100%;
-  }
+.logo-header {
+  width: 100px;
+  position: absolute;
+}
+
+.navbar-collapse {
+  margin-left: 67px;
+}
+
+.header-navbar {
+  height: 70px;
 }
