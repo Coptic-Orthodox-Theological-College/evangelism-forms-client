@@ -13,10 +13,12 @@ const Login = () => {
   const [showErrors, setShowErrors] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    (async () => {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (token) {
+        setIsAuthenticated(true);
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -45,19 +47,24 @@ const Login = () => {
       return;
     }
 
-    const response = await login(username, password);
+    try {
 
-    if (!response.success) {
-      openNotificationWithIcon('error', 'خطأ', response.message);
-      return;
-    }
+      const response = await login(username, password);
 
-    if (rememberMe) {
-      localStorage.setItem('token', response.token);
-    } else {
-      sessionStorage.setItem('token', response.token);
+      if (!response.success) {
+        openNotificationWithIcon('error', 'خطأ', response.message);
+        return;
+      }
+
+      if (rememberMe) {
+        localStorage.setItem('token', response.token);
+      } else {
+        sessionStorage.setItem('token', response.token);
+      }
+      setIsAuthenticated(true);
+    } catch (error) {
+      openNotificationWithIcon('error', 'خطأ', "حدث خطأ ما، الرجاء المحاولة مرة أخرى لاحقاً");
     }
-    setIsAuthenticated(true);
   }
 
   return (
