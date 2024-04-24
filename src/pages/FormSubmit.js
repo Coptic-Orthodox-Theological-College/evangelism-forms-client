@@ -25,42 +25,6 @@ const FormSubmit = () => {
     })();
   }, [FormTemplateId]);
 
-  const renderFormFields = () => {
-    return formFieldsData.map((field, index) => {
-      if (field.isEnum) {
-        return (
-          <MDBRow key={index}>
-            <MDBCol>
-              <label htmlFor={field.name}>{field.name}</label>
-              <select id={field.name} required={field.isRequired}>
-                <option value="">Select an option</option>
-                {field.values.map((value, valueIndex) => (
-                  <option key={valueIndex} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </MDBCol>
-          </MDBRow>
-        );
-      } else {
-        return (
-          <MDBRow key={index}>
-            <MDBCol>
-              <label htmlFor={field.name}>{field.name}</label>
-              <input
-                id={field.name}
-                type="text"
-                required={field.isRequired}
-                placeholder={field.description}
-              />
-            </MDBCol>
-          </MDBRow>
-        );
-      }
-    });
-  };
-
   return (
     <>
       <Header />
@@ -81,21 +45,54 @@ const FormSubmit = () => {
             <form dir='rtl'>
               {formFieldsData.map((field, index) => (
                 <div key={index} className="mb-3">
-                  <label htmlFor={`field-${index}`} className="form-label">{field.name}</label>
-                  <input
-                    type={field.isEnum ? 'select' : 'text'}
-                    className="form-control"
-                    id={`field-${index}`}
-                    placeholder={field.description}
-                    required={field.isRequired}
-                  />
-                  {field.isEnum && (
-                    <select className="form-select">
-                      {field.values.map((value, i) => (
-                        <option key={i} value={value}>{value}</option>
-                      ))}
-                    </select>
-                  )}
+                  <label htmlFor={`field-${`index`}`} className="form-label">{field.name}</label>
+                  <>
+                    {field.isEnum ? (
+                      <>
+                        {field.numberOfChoices == 1 ? (
+                          <>
+                            {field.values.map((value, valueIndex) => (
+                              <div key={valueIndex} className="form-check form-check-inline">
+                                <input
+                                  className="form-check-input"
+                                  type="checkbox"
+                                  name={`field-${index}-${valueIndex}`}
+                                  id={`field-${index}-${valueIndex}`}
+                                  value={value}
+                                  required={field.isRequired}
+                                />
+                                <label className="form-check-label" htmlFor={`field-${index}-${valueIndex}`}>{value}</label>
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            <select
+                              className="form-select"
+                              id={`field-${index}`}
+                              required={field.isRequired}>
+                              <option value="">Select an option</option>
+                              {field.values.map((value, valueIndex) => (
+                                <option key={valueIndex} value={value}>
+                                  {value}
+                                </option>
+                              ))}
+                            </select>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <input
+                          type='text'
+                          className="form-control"
+                          id={`field-${index}`}
+                          placeholder={field.description}
+                          required={field.isRequired}
+                        />
+                      </>
+                    )}
+                  </>
                 </div>
               ))}
               <button type="submit" className="btn btn-primary">Submit</button>
