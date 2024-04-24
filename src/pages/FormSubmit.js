@@ -4,7 +4,7 @@ import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { getFormTemplate } from '../apis/formTemplate';
 
 const FormSubmit = () => {
-  const [FormTemplateId, setFormTemplateId] = useState('660b3b92e635369dcb7a4ed5');
+  const [FormTemplateId, setFormTemplateId] = useState('66298ddee46eb7d8f2a8b891');
   const [formTemplateData, setFormTemplateData] = useState(null);
   const [formFieldsData, setFormFieldsData] = useState([]);
 
@@ -21,13 +21,16 @@ const FormSubmit = () => {
     (async () => {
       const response = await getFormTemplate(FormTemplateId);
       setFormTemplateData(response);
+      console.log("🚀 ~ response:", response)
       setFormFieldsData(response.fields);
     })();
+
   }, [FormTemplateId]);
 
   return (
     <>
       <Header />
+
       {/* 
         in formFieldsData we have (
           fields:
@@ -39,7 +42,11 @@ const FormSubmit = () => {
               numberOfChoices (if isEnum is true): number of choices
               values (if isEnum is true): array of choices
        */}
+
       <MDBContainer>
+        <h1 className="text-center mt-5">
+          استمارة {formTemplateData?.name}
+        </h1>
         <MDBRow>
           <MDBCol>
             <form dir='rtl'>
@@ -95,7 +102,9 @@ const FormSubmit = () => {
                   </>
                 </div>
               ))}
-              <button type="submit" className="btn btn-primary">Submit</button>
+              <div className="d-flex justify-content-center"> {/* Added this div for centering */}
+                <button type="submit" className="btn btn-primary">Submit</button>
+              </div>
             </form>
           </MDBCol>
         </MDBRow>
