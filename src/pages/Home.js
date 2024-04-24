@@ -14,7 +14,7 @@ const Home = () => {
                 style={{
                   width: '300px',
                 }} />
-              <h1 className='title-text'>الأمانة العامة لخدمة ثاموى بالاسكندرية</h1>
+              <h1 className='title-text'>الأمانة العامة لخدمة ثانوى بالاسكندرية</h1>
             </MDBCol>
           </MDBRow>
         </MDBContainer>
