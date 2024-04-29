@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import FormSubmit from './pages/FormSubmit';
 import NotFound404 from './pages/NotFound404';
+import Admin from './pages/Admin';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/form-submit" element={<FormSubmit />} />
         {/* 404 */}
         <Route path="*" element={<NotFound404 />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </Router>
   );
