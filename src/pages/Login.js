@@ -11,6 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
+  const [userType, setUserType] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -23,7 +24,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/home');
+      userType === 'admin' ? navigate('/admin') : navigate('/home');
     }
   }, [isAuthenticated, navigate]);
 
@@ -61,6 +62,9 @@ const Login = () => {
       } else {
         sessionStorage.setItem('token', response.token);
       }
+
+      setUserType(response.role);
+
       setIsAuthenticated(true);
     } catch (error) {
       openNotificationWithIcon('error', 'خطأ', "حدث خطأ ما، الرجاء المحاولة مرة أخرى لاحقاً");

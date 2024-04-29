@@ -10,8 +10,10 @@ import {
   MDBContainer,
   MDBBtn
 } from 'mdb-react-ui-kit';
+import { useNavigate } from 'react-router-dom';
 
-const Header = () => {
+const Header = ({ churchData }) => {
+  const navigate = useNavigate();
   const [showNavbarSecondary, setShowNavbarSecondary] = React.useState(false);
 
   const handleLogout = () => {
@@ -54,6 +56,13 @@ const Header = () => {
               <MDBNavbarLink href='#'>تواصل معنا</MDBNavbarLink>
             </MDBNavbarItem>
           </MDBNavbarNav>
+          {churchData && (
+            <MDBNavbarNav right>
+              <MDBNavbarItem>
+                <MDBNavbarLink onClick={() => navigate(`church/${churchData._id}`)}>{churchData.name}</MDBNavbarLink>
+              </MDBNavbarItem>
+            </MDBNavbarNav>
+          )}
           <MDBBtn color='danger' onClick={handleLogout} className='logout-btn'>
             تسجيل خروج
           </MDBBtn>
