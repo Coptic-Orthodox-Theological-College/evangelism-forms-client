@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from './Header';
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 
 const Home = () => {
+
+  useEffect(() => {
+    (async () => {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/';
+      }
+    })();
+  }, []);
+
   return (
     <>
       <Header />

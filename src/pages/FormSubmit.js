@@ -4,7 +4,7 @@ import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { getFormTemplate } from '../apis/formTemplate';
 
 const FormSubmit = () => {
-  const [FormTemplateId, setFormTemplateId] = useState('660b3b92e635369dcb7a4ed5');
+  const [FormTemplateId, setFormTemplateId] = useState('662eb98b0458746738a95157');
   const [formTemplateData, setFormTemplateData] = useState(null);
   const [formFieldsData, setFormFieldsData] = useState([]);
 
@@ -20,6 +20,7 @@ const FormSubmit = () => {
   useEffect(() => {
     (async () => {
       const response = await getFormTemplate(FormTemplateId);
+      console.log("🚀 ~ response:", response)
       setFormTemplateData(response);
       setFormFieldsData(response.fields);
     })();
@@ -39,6 +40,7 @@ const FormSubmit = () => {
               numberOfChoices (if isEnum is true): number of choices
               values (if isEnum is true): array of choices
        */}
+      <h1 className="text-center">{formTemplateData?.name}</h1>
       <MDBContainer>
         <MDBRow>
           <MDBCol>
@@ -49,7 +51,7 @@ const FormSubmit = () => {
                   <>
                     {field.isEnum ? (
                       <>
-                        {field.numberOfChoices == 1 ? (
+                        {field.numberOfChoices > 1 ? (
                           <>
                             {field.values.map((value, valueIndex) => (
                               <div key={valueIndex} className="form-check form-check-inline">
