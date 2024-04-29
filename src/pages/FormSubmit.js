@@ -22,13 +22,16 @@ const FormSubmit = () => {
       const response = await getFormTemplate(FormTemplateId);
       console.log("🚀 ~ response:", response)
       setFormTemplateData(response);
+      console.log("🚀 ~ response:", response)
       setFormFieldsData(response.fields);
     })();
+
   }, [FormTemplateId]);
 
   return (
     <>
       <Header />
+
       {/* 
         in formFieldsData we have (
           fields:
@@ -42,6 +45,9 @@ const FormSubmit = () => {
        */}
       <h1 className="text-center">{formTemplateData?.name}</h1>
       <MDBContainer>
+        <h1 className="text-center mt-5">
+          استمارة {formTemplateData?.name}
+        </h1>
         <MDBRow>
           <MDBCol>
             <form dir='rtl'>
@@ -97,7 +103,9 @@ const FormSubmit = () => {
                   </>
                 </div>
               ))}
-              <button type="submit" className="btn btn-primary">Submit</button>
+              <div className="d-flex justify-content-center"> {/* Added this div for centering */}
+                <button type="submit" className="btn btn-primary">Submit</button>
+              </div>
             </form>
           </MDBCol>
         </MDBRow>
