@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import { MDBContainer, MDBRow, MDBCol } from "mdb-react-ui-kit";
 import { createChurch, getChurch } from "../apis/church";
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import { openNotificationWithIcon } from "../utils/notification";
-import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [showAddChurchPopup, setShowAddChurchPopup] = useState(false);
   const [churchData, setChurchData] = useState({});
   const [churchName, setChurchName] = useState("");
   const [address, setAddress] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -19,11 +21,16 @@ const Home = () => {
       if (!token) {
         window.location.href = "/";
       } else {
-        const response = await getChurch(token);
-        if (!response.success) {
-          setShowAddChurchPopup(true);
+        if (!localStorage.getItem("church")) {
+          const response = await getChurch(token);
+          if (!response.success) {
+            setShowAddChurchPopup(true);
+          } else {
+            localStorage.setItem("church", JSON.stringify(response.church));
+            setChurchData(response.church);
+          }
         } else {
-          setChurchData(response.church);
+          setChurchData(JSON.parse(localStorage.getItem("church")));
         }
       }
     })();
@@ -47,6 +54,13 @@ const Home = () => {
     setShowAddChurchPopup(false);
   };
 
+  const handleCancelPopup = () => {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    localStorage.removeItem("church");
+    window.location.href = "/";
+  }
+
   return (
     <>
       <Header churchData={churchData} />
@@ -55,7 +69,7 @@ const Home = () => {
           <MDBRow className="justify-content-center vh-100">
             <MDBCol md="8" className="text-center">
               <img
-                src="logo.png"
+                src={logo}
                 alt="logo"
                 className="d-block mx-auto mb-2 mt-5"
                 style={{
@@ -84,24 +98,19 @@ const Home = () => {
                     كراسة الشروط
                   </a>
                 </MDBCol>
-                <MDBCol className="sub-titlebaground">
-                  <Link
-                    to={{
-                      pathname: "/all-activities",
-                      state: { churchData: churchData }, // Pass your prop here
-                    }}
+                <MDBCol className="sub-titlebaground" style={{ cursor: "pointer" }} onClick={() => navigate('/all-activities')}>
+                  <div
                     style={{ color: "white", fontSize: "1.5em" }}
                   >
                     الاشتراك في المهرجان
-                  </Link>
+                  </div>
                 </MDBCol>
-                <MDBCol className="sub-titlebaground">
-                  <a
-                    href="/all-activites"
+                <MDBCol className="sub-titlebaground" style={{ cursor: "pointer" }} onClick={() => window.location.href = '/result'}>
+                  <div
                     style={{ color: "white", fontSize: "1.5em" }}
                   >
                     نتيجة المهرجان
-                  </a>
+                  </div>
                 </MDBCol>
                 {churchData.name && (
                   <MDBCol className="sub-titlebaground">
@@ -162,13 +171,22 @@ const Home = () => {
               required
               onChange={(e) => setAddress(e.target.value)}
             />
-            <button
-              type="submit"
-              className="btn btn-primary"
-              onClick={handleAddChurch}
-            >
-              إضافة
-            </button>
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                onClick={handleAddChurch}
+              >
+                إضافة
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleCancelPopup}
+              >
+                إلغاء
+              </button>
+            </div>
           </form>
         </Modal>
       )}
