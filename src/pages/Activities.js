@@ -4,13 +4,11 @@ import { MDBContainer, MDBRow, MDBCol } from "mdb-react-ui-kit";
 import { createChurch, getChurch } from "../apis/church";
 import { Button, Modal } from "antd";
 import { openNotificationWithIcon } from "../utils/notification";
-import { Link } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
-const Home = () => {
-  const [showAddChurchPopup, setShowAddChurchPopup] = useState(false);
-  const [churchData, setChurchData] = useState({});
-  const [churchName, setChurchName] = useState("");
-  const [address, setAddress] = useState("");
+const Activities = () => {
+      const location = useLocation();
+  const churchData = location.state.churchData;
 
   useEffect(() => {
     (async () => {
@@ -18,34 +16,9 @@ const Home = () => {
         localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) {
         window.location.href = "/";
-      } else {
-        const response = await getChurch(token);
-        if (!response.success) {
-          setShowAddChurchPopup(true);
-        } else {
-          setChurchData(response.church);
-        }
       }
     })();
   }, []);
-
-  const handleAddChurch = async () => {
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-
-    if (churchName === "" || address === "") {
-      openNotificationWithIcon("error", "خطأ", "الرجاء ملء جميع الحقول");
-      return;
-    }
-
-    const response = await createChurch(churchName, address, token);
-    if (!response.success) {
-      openNotificationWithIcon("error", "خطأ", response.message);
-      return;
-    }
-    openNotificationWithIcon("success", "نجاح", "تم إضافة الكنيسة بنجاح");
-    setShowAddChurchPopup(false);
-  };
 
   return (
     <>
@@ -85,15 +58,12 @@ const Home = () => {
                   </a>
                 </MDBCol>
                 <MDBCol className="sub-titlebaground">
-                  <Link
-                    to={{
-                      pathname: "/all-activities",
-                      state: { churchData: churchData }, // Pass your prop here
-                    }}
+                  <a
+                    href="/all-activites"
                     style={{ color: "white", fontSize: "1.5em" }}
                   >
                     الاشتراك في المهرجان
-                  </Link>
+                  </a>
                 </MDBCol>
                 <MDBCol className="sub-titlebaground">
                   <a
@@ -126,54 +96,8 @@ const Home = () => {
           </MDBRow>
         </MDBContainer>
       </div>
-      {showAddChurchPopup && (
-        <Modal
-          visible={showAddChurchPopup}
-          closable={false}
-          footer={null}
-          style={{
-            direction: "rtl",
-            textAlign: "center",
-            fontFamily: "Cairo",
-            fontSize: "1.5rem",
-          }}
-        >
-          <form
-            style={{
-              padding: "1rem",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "1rem",
-            }}
-          >
-            <h2>الرجاء إضافة كنيستك</h2>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="اسم الكنيسة"
-              required
-              onChange={(e) => setChurchName(e.target.value)}
-            />
-            <input
-              type="text"
-              className="form-control"
-              placeholder="القطاع"
-              required
-              onChange={(e) => setAddress(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="btn btn-primary"
-              onClick={handleAddChurch}
-            >
-              إضافة
-            </button>
-          </form>
-        </Modal>
-      )}
     </>
   );
 };
 
-export default Home;
+export default Activities;
