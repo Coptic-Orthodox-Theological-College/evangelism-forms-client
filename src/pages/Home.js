@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Header from './Header';
+import Header from './components/Header';
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { createChurch, getChurch } from '../apis/church';
 import { Button, Modal } from 'antd';
