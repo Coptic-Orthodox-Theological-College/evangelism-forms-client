@@ -11,6 +11,7 @@ import {
   MDBBtn
 } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo.png';
 
 const Header = ({ churchData }) => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Header = ({ churchData }) => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
+    localStorage.removeItem('church');
     window.location.href = '/';
   };
 
@@ -26,7 +28,7 @@ const Header = ({ churchData }) => {
     <MDBNavbar expand='lg' light bgColor='light' className='header-navbar'>
       <MDBContainer fluid>
         <MDBNavbarBrand href='/home'>
-          <img src='logo.png' alt='logo' loading='lazy' className='logo-header' />
+          <img src={logo} alt='logo' loading='lazy' className='logo-header' />
         </MDBNavbarBrand>
         <MDBNavbarToggler
           type='button'

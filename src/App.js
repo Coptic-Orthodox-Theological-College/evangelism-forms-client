@@ -6,6 +6,7 @@ import FormSubmit from './pages/FormSubmit';
 import NotFound404 from './pages/NotFound404';
 import Admin from './pages/Admin';
 import Activities from './pages/Activities';
+import FormTemplates from './pages/FormTemplates';
 
 function App() {
   return (
@@ -14,8 +15,9 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/form-submit" element={<FormSubmit />} />
         <Route path="/all-activities" element={<Activities />} />
+        <Route path="/form-templates/:activityId" element={<FormTemplates />} />
+        <Route path="/form-submit/:formTemplateId" element={<FormSubmit />} />
         {/* 404 */}
         <Route path="*" element={<NotFound404 />} />
         <Route path="/admin" element={<Admin />} />

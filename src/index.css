@@ -149,7 +149,7 @@ body {
 }
 
 .back-home:hover {
-  background: #222;
+  background: #131313;
   color: #ddd;
 }
 
@@ -159,12 +159,24 @@ body {
   border-radius: 5px;
   font-size: 20px;
   font-weight: 600;
-  width: 50%;
+  width: 500px;
   cursor: pointer;
+  min-width: 50%;
+  margin: auto;
 }
 
 .sub-titlebaground:hover {
-  background: #0000003d;
+  background: #00000075;
   transition: 0.3s;
   box-shadow: 0 0 10px #ff8000;
+}
+
+.continer-activities {
+  margin-top: 6rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 1em;
 }
