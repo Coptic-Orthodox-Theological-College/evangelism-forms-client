@@ -26,7 +26,7 @@ const Login = () => {
     if (isAuthenticated) {
       userType === 'admin' ? navigate('/admin') : navigate('/home');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
