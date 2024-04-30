@@ -8,3 +8,12 @@ export const getFormTemplate = async (FormTemplateId) => {
     return error.response.data;
   }
 }
+
+export const listFormTemplatesByActivity = async (activityId) => {
+  try {
+    const response = await apiClient.get(`/form-templates/list/${activityId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

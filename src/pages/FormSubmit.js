@@ -4,7 +4,7 @@ import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { getFormTemplate } from '../apis/formTemplate';
 
 const FormSubmit = () => {
-  const [FormTemplateId, setFormTemplateId] = useState('66312fae1bf961f67e1a951f');
+  const FormTemplateId = window.location.pathname.split("/")[2];
   const [formTemplateData, setFormTemplateData] = useState(null);
   const [formFieldsData, setFormFieldsData] = useState([]);
   const [formSubmitData, setFormSubmitData] = useState([]);
