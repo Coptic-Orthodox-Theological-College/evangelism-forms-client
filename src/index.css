@@ -147,7 +147,24 @@ body {
   background: #222;
   border-radius: 6px;
 }
+
 .back-home:hover {
   background: #222;
   color: #ddd;
+}
+
+.sub-titlebaground {
+  background: #00000023;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 20px;
+  font-weight: 600;
+  width: 50%;
+  cursor: pointer;
+}
+
+.sub-titlebaground:hover {
+  background: #0000003d;
+  transition: 0.3s;
+  box-shadow: 0 0 10px #ff8000;
 }

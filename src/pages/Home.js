@@ -56,10 +56,50 @@ const Home = () => {
                   width: '300px',
                 }} />
               <h1 className='title-text'>الأمانة العامة لخدمة ثانوى بالاسكندرية</h1>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', marginTop: '6rem' }}>
+                <MDBCol className='sub-titlebaground'>
+                  <a
+                    href='https://drive.google.com/file/d/1kK8iJ2gXz4V5tZwq7Q8KwQ1Vq1Wvq6zv/view?usp=sharing'
+                    target='_blank'
+                    rel='noreferrer'
+                    style={{ color: 'white', fontSize: "1.5em" }}
+                  >
+                    كراسة الشروط
+                  </a>
+                </MDBCol>
+                <MDBCol className='sub-titlebaground'>
+                  <a
+                    href='/all-activites'
+                    style={{ color: 'white', fontSize: "1.5em" }}
+                  >
+                    الاشتراك في المهرجان
+                  </a>
+                </MDBCol>
+                <MDBCol className='sub-titlebaground'>
+                  <a
+                    href='/all-activites'
+                    style={{ color: 'white', fontSize: "1.5em" }}
+                  >
+                    نتيجة المهرجان
+                  </a>
+                </MDBCol>
+                {churchData.name && (
+                  <MDBCol className='sub-titlebaground'>
+                    <a
+                      href='/all-activites'
+                      style={{ color: 'white', fontSize: "1.5em" }}
+                    >
+                      كنيستك : <span style={{
+                        textShadow: '2px 2px 4px #ff8000',
+                      }}> {churchData.name} </span>
+                    </a>
+                  </MDBCol>
+                )}
+              </div>
             </MDBCol>
           </MDBRow>
-        </MDBContainer>
-      </div>
+        </MDBContainer >
+      </div >
       {showAddChurchPopup && (
         <Modal
           visible={showAddChurchPopup}
