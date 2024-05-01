@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { getFormTemplate } from '../apis/formTemplate';
+import { openNotificationWithIcon } from '../utils/notification';
 
 const FormSubmit = () => {
   const FormTemplateId = window.location.pathname.split("/")[2];
@@ -24,15 +25,98 @@ const FormSubmit = () => {
       setFormTemplateData(response);
       setFormFieldsData(response.fields);
     })();
-
   }, [FormTemplateId]);
+
+  const handleInputChange = (e, fieldId) => {
+    const newObject = {
+      fieldId,
+      value: e.target.value
+    };
+    setFormSubmitData((prevData) => [...prevData.filter(item => item.fieldId !== fieldId), newObject]);
+  };
+
+  // TODO: we need to update numberOfChoices to (maxNumberOfChoices) and (minNumberOfChoices) to handle the case of multiple choices
+  const handleCheckboxChange = (e, fieldId, numberOfChoices) => {
+    const isChecked = e.target.checked;
+    const fieldValue = e.target.value;
+
+    // Find if the fieldId exists in formSubmitData
+    const fieldIndex = formSubmitData.findIndex(item => item.fieldId === fieldId);
+
+    // If the checkbox is checked
+    if (isChecked) {
+      if (fieldIndex === -1) {
+        // If the fieldId doesn't exist, add it to formSubmitData with the new value
+        const newObject = {
+          fieldId,
+          value: fieldValue
+        };
+        setFormSubmitData(prevData => [...prevData, newObject]);
+      } else {
+        // If the fieldId exists, update its value with the new checked value
+        const fieldValues = formSubmitData[fieldIndex].value.split(",");
+        if (fieldValues.length < numberOfChoices) {
+          fieldValues.push(fieldValue);
+          const newObject = {
+            fieldId,
+            value: fieldValues.join(",")
+          };
+          setFormSubmitData(prevData => [
+            ...prevData.filter(item => item.fieldId !== fieldId),
+            newObject
+          ]);
+        } else {
+          openNotificationWithIcon('error', 'خطأ', `يجب اختيار ${numberOfChoices} فقط`);
+          // Optionally, you can also uncheck the checkbox here to prevent more selections
+          e.target.checked = false;
+        }
+      }
+    } else {
+      // If the checkbox is unchecked
+      if (fieldIndex !== -1) {
+        // If the fieldId exists, remove the unchecked value from its value
+        const fieldValues = formSubmitData[fieldIndex].value
+          .split(",")
+          .filter(value => value !== fieldValue);
+        if (fieldValues.length === 0) {
+          // If no more values are selected, remove the fieldId from formSubmitData
+          setFormSubmitData(prevData =>
+            prevData.filter(item => item.fieldId !== fieldId)
+          );
+        } else {
+          // Update the value of the fieldId without the unchecked value
+          const newObject = {
+            fieldId,
+            value: fieldValues.join(",")
+          };
+          setFormSubmitData(prevData => [
+            ...prevData.filter(item => item.fieldId !== fieldId),
+            newObject
+          ]);
+        }
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // const formData = new FormData(e.target);
+    // const formValues = {};
+
+    // for (let [key, value] of formData.entries()) {
+    //   formValues[key] = value;
+    // }
+
+    // setFormSubmitData(formValues);
+    console.log("🚀 ~ handleSubmit ~ formSubmitData:", formSubmitData)
+    return;
+  }
 
   return (
     <>
       <Header />
-
       {/* 
-        in formFieldsData we have (
+        formFieldsData
           fields:
             name: name of the field
             description: description of the field ( indeed it as a tooltip )
@@ -48,7 +132,8 @@ const FormSubmit = () => {
         </h1>
         <MDBRow>
           <MDBCol>
-            <form dir='rtl'>
+            {/* i dont need form to go anyware i wll handle it  */}
+            <form dir='rtl' onSubmit={handleSubmit} className="mt-5">
               {formFieldsData
                 .slice() // create a shallow copy to avoid mutating the original array
                 .sort((a, b) => a.order - b.order) // sort by order
@@ -68,7 +153,9 @@ const FormSubmit = () => {
                                     name={`field-${index}-${valueIndex}`}
                                     id={`field-${index}-${valueIndex}`}
                                     value={value}
-                                    required={field.isRequired}
+                                    onChange={(e) => {
+                                      handleCheckboxChange(e, field._id, field.numberOfChoices);
+                                    }}
                                   />
                                   <label className="form-check-label" htmlFor={`field-${index}-${valueIndex}`}>{value}</label>
                                 </div>
@@ -79,7 +166,11 @@ const FormSubmit = () => {
                               <select
                                 className="form-select"
                                 id={`field-${index}`}
-                                required={field.isRequired}>
+                                required={field.isRequired}
+                                onChange={(e) => {
+                                  handleInputChange(e, field._id);
+                                }}
+                              >
                                 <option value="">Select an option</option>
                                 {field.values.map((value, valueIndex) => (
                                   <option key={valueIndex} value={value}>
@@ -98,13 +189,16 @@ const FormSubmit = () => {
                             id={`field-${index}`}
                             placeholder={field.description}
                             required={field.isRequired}
+                            onChange={(e) => {
+                              handleInputChange(e, field._id);
+                            }}
                           />
                         </>
                       )}
                     </>
                   </div>
                 ))}
-              <div className="d-flex justify-content-center"> {/* Added this div for centering */}
+              <div className="d-flex justify-content-center">
                 <button type="submit" className="btn btn-primary">Submit</button>
               </div>
             </form>
