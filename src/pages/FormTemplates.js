@@ -38,11 +38,6 @@ const FormTemplates = () => {
     })();
   }, [activityId]);
 
-  useEffect(() => {
-    console.log("🚀 ~ FormTemplates ~ allFormTemplates:", allFormTemplates)
-  }, [allFormTemplates]);
-
-
   return (
     <>
       <Header churchData={churchData} />
