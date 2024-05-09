@@ -191,7 +191,6 @@ body {
   font-size: inherit;
   background: inherit;
   color: inherit;
-  transition: .3s all linear;
 } 
 .editable-input:focus {
   outline: none;
@@ -201,9 +200,6 @@ body {
 
 .edit-button {
   cursor: pointer;
-  font-size: 5em;
-  position: relative;
-  top: 5px;
 }
 
 .hide {
@@ -211,7 +207,11 @@ body {
 }
 
 .editing {
-  background: #E9F5FA;
-  color: #f1f1f1;
-  box-shadow: -2px 0px 0px #0081C6;
+  background: #8400ff;
+  /* box-shadow: -2px 0px 0px #0081C6; */
+  border: black 1px solid;
+  max-width: fit-content;
+  padding: 0.5rem;
+  border-radius: 10px;
 }
+

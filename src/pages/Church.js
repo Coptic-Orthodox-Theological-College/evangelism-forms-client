@@ -74,14 +74,37 @@ const Church = () => {
     <>
       <Header />
       <MDBContainer className="mt-5">
+        <h1 className="text-center mt-5 mb-5">
+          معلومات الكنيسة
+        </h1>
         <MDBRow>
-          <MDBCol>
+          <MDBCol dir='rtl'>
             {churchData && (
-              <EditableField initialValue={churchData.name} />
+              <>
+                <div style={{
+                  fontSize: '1.2rem',
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    gap: '1rem',
+                  }}>
+                    الاسم:
+                    <EditableField initialValue={churchData.name} />
+                  </div>
+                  <br />
+                  <div style={{
+                    display: 'flex',
+                    gap: '1rem',
+                  }}>
+                    قطاع:
+                    <EditableField initialValue={churchData.address} />
+                  </div>
+                </div>
+              </>
             )}
           </MDBCol>
-        </MDBRow>
-      </MDBContainer>
+        </MDBRow >
+      </MDBContainer >
     </>
   );
 };
