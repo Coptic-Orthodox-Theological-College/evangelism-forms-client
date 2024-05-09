@@ -61,7 +61,7 @@ const Header = ({ churchData }) => {
           {churchData && (
             <MDBNavbarNav right>
               <MDBNavbarItem>
-                <MDBNavbarLink onClick={() => navigate(`church/${churchData._id}`)}>{churchData.name}</MDBNavbarLink>
+              <MDBNavbarLink onClick={() => window.location.href = `/church`}>{churchData.name}</MDBNavbarLink>
               </MDBNavbarItem>
             </MDBNavbarNav>
           )}

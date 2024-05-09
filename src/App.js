@@ -7,6 +7,7 @@ import NotFound404 from './pages/NotFound404';
 import Admin from './pages/Admin';
 import Activities from './pages/Activities';
 import FormTemplates from './pages/FormTemplates';
+import Church from './pages/Church';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/all-activities" element={<Activities />} />
         <Route path="/form-templates/:activityId" element={<FormTemplates />} />
         <Route path="/form-submit/:formTemplateId" element={<FormSubmit />} />
+        <Route path="/church" element={<Church />} />
         {/* 404 */}
         <Route path="*" element={<NotFound404 />} />
         <Route path="/admin" element={<Admin />} />

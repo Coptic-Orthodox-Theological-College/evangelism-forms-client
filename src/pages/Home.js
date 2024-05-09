@@ -115,7 +115,7 @@ const Home = () => {
                 {churchData.name && (
                   <MDBCol className="sub-titlebaground">
                     <a
-                      href="/all-activites"
+                      href="/church"
                       style={{ color: "white", fontSize: "1.5em" }}
                     >
                       كنيستك :{" "}
