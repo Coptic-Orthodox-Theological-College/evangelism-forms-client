@@ -6,6 +6,7 @@ import { Modal } from "antd";
 import { openNotificationWithIcon } from "../utils/notification";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import WaveSvg from "./components/WaveSvg";
 
 const Home = () => {
   const [showAddChurchPopup, setShowAddChurchPopup] = useState(false);
@@ -64,14 +65,19 @@ const Home = () => {
   return (
     <>
       <Header churchData={churchData} />
-      <div className="background-radial-gradient">
+      <div className="background-radial-gradient"
+        style={{
+          minHeight: "100vh",
+          paddingBlock: "5rem",
+        }}
+      >
         <MDBContainer fluid>
-          <MDBRow className="justify-content-center vh-100">
+          <MDBRow className="justify-content-center">
             <MDBCol md="8" className="text-center">
               <img
                 src={logo}
                 alt="logo"
-                className="d-block mx-auto mb-2 mt-5"
+                className="d-block mx-auto mb-2"
                 style={{
                   width: "300px",
                 }}
@@ -88,7 +94,7 @@ const Home = () => {
                   marginTop: "6rem",
                 }}
               >
-                <MDBCol className="sub-titlebaground">
+                <MDBCol className="sub-titlebaground home">
                   <a
                     href="https://drive.google.com/file/d/1kK8iJ2gXz4V5tZwq7Q8KwQ1Vq1Wvq6zv/view?usp=sharing"
                     target="_blank"
@@ -98,14 +104,14 @@ const Home = () => {
                     كراسة الشروط
                   </a>
                 </MDBCol>
-                <MDBCol className="sub-titlebaground" style={{ cursor: "pointer" }} onClick={() => navigate('/all-activities')}>
+                <MDBCol className="sub-titlebaground home" style={{ cursor: "pointer" }} onClick={() => navigate('/all-activities')}>
                   <div
                     style={{ color: "white", fontSize: "1.5em" }}
                   >
                     الاشتراك في المهرجان
                   </div>
                 </MDBCol>
-                <MDBCol className="sub-titlebaground" style={{ cursor: "pointer" }} onClick={() => window.location.href = '/result'}>
+                <MDBCol className="sub-titlebaground home" style={{ cursor: "pointer" }} onClick={() => window.location.href = '/result'}>
                   <div
                     style={{ color: "white", fontSize: "1.5em" }}
                   >
@@ -113,11 +119,8 @@ const Home = () => {
                   </div>
                 </MDBCol>
                 {churchData.name && (
-                  <MDBCol className="sub-titlebaground">
-                    <a
-                      href="/church"
-                      style={{ color: "white", fontSize: "1.5em" }}
-                    >
+                  <MDBCol className="sub-titlebaground home" style={{ cursor: "pointer" }} onClick={() => window.location.href = '/church'}>
+                    <div style={{ color: "white", fontSize: "1.5em" }}>
                       كنيستك :{" "}
                       <span
                         style={{
@@ -127,13 +130,14 @@ const Home = () => {
                         {" "}
                         {churchData.name}{" "}
                       </span>
-                    </a>
+                    </div>
                   </MDBCol>
                 )}
               </div>
             </MDBCol>
           </MDBRow>
         </MDBContainer>
+        <WaveSvg />
       </div>
       {showAddChurchPopup && (
         <Modal

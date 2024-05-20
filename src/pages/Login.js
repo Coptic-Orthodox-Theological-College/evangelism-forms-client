@@ -59,8 +59,10 @@ const Login = () => {
 
       if (rememberMe) {
         localStorage.setItem('token', response.token);
+        localStorage.setItem('userId', response.userId);
       } else {
         sessionStorage.setItem('token', response.token);
+        sessionStorage.setItem('userId', response.userId);
       }
 
       setUserType(response.role);
@@ -73,7 +75,7 @@ const Login = () => {
 
   return (
     <div className='custom-container'>
-      <MDBContainer fluid className='p-4 background-radial-gradient w-50 custom-container-card '>
+      <MDBContainer fluid className='p-4 background-radial-gradient custom-container-card '>
         <MDBRow className='justify-content-center'>
           <MDBCol md='6' className='position-relative'>
             <div id="radius-shape-1" className="position-absolute rounded-circle shadow-5-strong"></div>
