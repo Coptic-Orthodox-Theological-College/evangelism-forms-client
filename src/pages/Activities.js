@@ -4,6 +4,7 @@ import { MDBContainer, MDBRow, MDBCol } from "mdb-react-ui-kit";
 import { openNotificationWithIcon } from "../utils/notification";
 import { listActivities } from "../apis/activities";
 import { useNavigate } from "react-router-dom";
+import WaveSvg from "./components/WaveSvg";
 
 const Activities = () => {
   const [churchData, setChurchData] = useState({});
@@ -36,9 +37,12 @@ const Activities = () => {
   return (
     <>
       <Header churchData={churchData} />
-      <div className="background-radial-gradient">
+      <div className="background-radial-gradient" style={{
+        minHeight: "100vh",
+        paddingBottom: "5rem",
+      }}>
         <MDBContainer fluid>
-          <MDBRow className="justify-content-center vh-100">
+          <MDBRow className="justify-content-center">
             <MDBCol md="8" className="text-center">
               <h1 className="title-text mb-2 mt-5">
                 انشطة مهرجان ثانوى 2024
@@ -59,7 +63,8 @@ const Activities = () => {
             </MDBCol>
           </MDBRow>
         </MDBContainer >
-      </div >
+        <WaveSvg />
+      </div>
     </>
   );
 };

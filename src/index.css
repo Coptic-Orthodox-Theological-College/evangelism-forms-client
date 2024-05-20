@@ -79,6 +79,7 @@ body {
 .custom-container-card {
   border-radius: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 50% !important;
 }
 
 .ant-notification {
@@ -99,6 +100,7 @@ body {
   cursor: pointer;
   width: 120px;
 }
+
 .title-text {
   color: #fff;
   font-size: 3rem;
@@ -109,15 +111,7 @@ body {
 
 .logo-header {
   width: 100px;
-  position: absolute;
-}
-
-.navbar-collapse {
-  margin-left: 67px;
-}
-
-.header-navbar {
-  height: 70px;
+  margin: -10px;
 }
 
 .section .error {
@@ -159,10 +153,20 @@ body {
   border-radius: 5px;
   font-size: 20px;
   font-weight: 600;
-  width: 500px;
   cursor: pointer;
-  min-width: 50%;
   margin: auto;
+  width: 382px;
+  height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.sub-titlebaground.home {
+  width: 525px;
+  height: 291px;
+  padding: 18px;
 }
 
 .sub-titlebaground:hover {
@@ -191,7 +195,8 @@ body {
   font-size: inherit;
   background: inherit;
   color: inherit;
-} 
+}
+
 .editable-input:focus {
   outline: none;
   background: white;
@@ -215,3 +220,69 @@ body {
   border-radius: 10px;
 }
 
+.submition-card {
+  font-size: 1.2em;
+  background-color: #0000000d;
+  border-radius: 0.5em;
+  padding: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.submition-card:hover {
+  box-shadow: 0 0 0.5em #ff8000;
+}
+
+@media screen and (max-width: 768px) {
+  #radius-shape-1 {
+    display: none;
+  }
+  #radius-shape-2 {
+    display: none;
+  }
+  .custom-container-card {
+    width: 100% !important;
+    height: 100%;
+    border: 0px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+  }
+  .sub-titlebaground {
+    max-width: 90%;
+  }
+}
+
+.waves > use {
+  animation: move-forever 2s -2s linear infinite;
+}
+
+.waves > use:nth-child(2) {
+  animation-delay: -3s;
+  animation-duration: 6s;
+}
+.waves > use:nth-child(3) {
+  animation-delay: -4s;
+  animation-duration: 3s;
+}
+
+@keyframes move-forever {
+  0% {
+    transform: translate(-90px, 0%);
+  }
+  100% {
+    transform: translate(85px, 0%);
+  }
+}
+
+.svg {
+  /* at the very btm not working */
+  /* and if the div is empt also make it in very botm */
+  position: absolute;
+  width: 100%;
+  height: 30vw;
+  max-height: 80px;
+}

@@ -1,7 +1,6 @@
 import axios from "axios";
 
 import {
-  SECRET_KEY,
   SERVER_URL,
 } from "../constants.js";
 
