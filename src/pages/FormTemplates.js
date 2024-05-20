@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import WaveSvg from "./components/WaveSvg";
+import { deleteSubmission } from "../apis/formSubmit";
 
 const FormTemplates = () => {
   const [churchData, setChurchData] = useState({});
@@ -20,6 +21,8 @@ const FormTemplates = () => {
   const [showEditOrAddSubmition, setShowEditOrAddSubmition] = useState(false);
   const [selectedFormTemplate, setSelectedFormTemplate] = useState(null);
   const [allSubmitionsForSelectedFormTemplate, setAllSubmitionsForSelectedFormTemplate] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedSubmition, setSelectedSubmition] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -57,6 +60,25 @@ const FormTemplates = () => {
       navigate(`/form-submit/${formTemplate._id}`)
     }
   };
+
+  const handelDeleteSubmition = (submissionId) => async () => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const response = await deleteSubmission(submissionId, token);
+    if (!response.success) {
+      openNotificationWithIcon("error", "خطأ", response.message);
+      return;
+    } else {
+      openNotificationWithIcon("success", "تم", response.message);
+      setShowEditOrAddSubmition(false);
+      const response1 = await listFormTemplatesByActivity(activityId);
+      if (!response1.success) {
+        openNotificationWithIcon("error", "خطأ", response.message);
+        return;
+      } else {
+        setAllFormTemplates(response1.formTemplates);
+      }
+    }
+  }
 
   return (
     <>
@@ -172,7 +194,13 @@ const FormTemplates = () => {
                         <FontAwesomeIcon icon={faPen} />
                       </Button>
                       {/* TODO: Add delete submition */}
-                      <Button onClick={() => { }} danger>
+                      <Button onClick={
+                        () => {
+                          setShowDeleteModal(true);
+                          setShowEditOrAddSubmition(false);
+                          setSelectedSubmition(submition.submissionId);
+                        }
+                      } danger>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>
                     </div>
@@ -185,6 +213,44 @@ const FormTemplates = () => {
                   إضافة جديد
                 </button>
               </div>
+            </div>
+          </Modal>
+        )}
+        {showDeleteModal && (
+          <Modal
+            open={showDeleteModal}
+            footer={null}
+            onCancel={() => setShowDeleteModal(false)}
+            style={{
+              direction: "rtl",
+              textAlign: "center",
+              fontFamily: "Cairo",
+              fontSize: "1.5rem",
+              minWidth: "fit-content",
+              margin: "0 auto",
+            }}
+          >
+            <h4>هل تريد حذف هذا التقديم ؟</h4>
+            <div
+              style={{
+                padding: "1rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "1rem",
+              }}
+            >
+              <Button
+                onClick={handelDeleteSubmition(selectedSubmition)}
+                danger
+              >
+                نعم
+              </Button>
+              <Button
+                onClick={() => setShowDeleteModal(false)}
+              >
+                لا
+              </Button>
             </div>
           </Modal>
         )}

@@ -3,8 +3,9 @@ import Header from './components/Header';
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { getFormTemplate } from '../apis/formTemplate';
 import { openNotificationWithIcon } from '../utils/notification';
-import { getOneSubmission, submitForm } from '../apis/formSubmit';
+import { deleteSubmission, getOneSubmission, submitForm } from '../apis/formSubmit';
 import { useNavigate } from 'react-router-dom';
+import { Button, Modal } from 'antd';
 
 const FormSubmit = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const FormSubmit = () => {
   const [formSubmmitedDataTemp, setFormSubmmitedDataTemp] = useState({});
   const [submmitedAlready, setSubmmitedAlready] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -223,6 +225,14 @@ const FormSubmit = () => {
   }
 
   const handleDelete = async () => {
+    const response = await deleteSubmission(submitionId, token);
+
+    if (response.success) {
+      openNotificationWithIcon('success', 'نجاح', 'تم حذف النموذج بنجاح');
+      navigate('/');
+    } else {
+      openNotificationWithIcon('error', 'خطأ', response.message);
+    }
   }
 
   return (
@@ -373,7 +383,7 @@ const FormSubmit = () => {
                           <button
                             type="button"
                             className="btn btn-danger ms-2"
-                            onClick={() => { }}
+                            onClick={() => setShowDeleteModal(true)}
                           >
                             حذف
                           </button>
@@ -459,6 +469,44 @@ const FormSubmit = () => {
               )}
           </MDBCol>
         </MDBRow>
+        {showDeleteModal && (
+          <Modal
+            open={showDeleteModal}
+            footer={null}
+            onCancel={() => setShowDeleteModal(false)}
+            style={{
+              direction: "rtl",
+              textAlign: "center",
+              fontFamily: "Cairo",
+              fontSize: "1.5rem",
+              minWidth: "fit-content",
+              margin: "0 auto",
+            }}
+          >
+            <h4>هل تريد حذف هذا التقديم ؟</h4>
+            <div
+              style={{
+                padding: "1rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "1rem",
+              }}
+            >
+              <Button
+                onClick={handleDelete}
+                danger
+              >
+                نعم
+              </Button>
+              <Button
+                onClick={() => setShowDeleteModal(false)}
+              >
+                لا
+              </Button>
+            </div>
+          </Modal>
+        )}
       </MDBContainer>
     </>
   );

@@ -29,3 +29,16 @@ export const getOneSubmission = async (submissionId, token) => {
     return error.response.data;
   }
 };
+
+export const deleteSubmission = async (submissionId, token) => {
+  try {
+    const response = await apiClient.delete(`/form-submissions/delete/${submissionId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
