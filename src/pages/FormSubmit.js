@@ -3,7 +3,7 @@ import Header from './components/Header';
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { getFormTemplate } from '../apis/formTemplate';
 import { openNotificationWithIcon } from '../utils/notification';
-import { deleteSubmission, getOneSubmission, submitForm } from '../apis/formSubmit';
+import { deleteSubmission, getOneSubmission, submitForm, updateSubmission } from '../apis/formSubmit';
 import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'antd';
 
@@ -222,6 +222,14 @@ const FormSubmit = () => {
   }
 
   const handleEdit = async (e) => {
+    e.preventDefault();
+    const response = await updateSubmission(submitionId, formSubmmitedData.data, token);
+    if (response.success) {
+      openNotificationWithIcon('success', 'نجاح', 'تم تعديل النموذج بنجاح');
+      setIsEditing(false);
+    } else {
+      openNotificationWithIcon('error', 'خطأ', response.message);
+    }
   }
 
   const handleDelete = async () => {
@@ -355,7 +363,10 @@ const FormSubmit = () => {
                         <div
                           style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}
                         >
-                          <button type="submit" className="btn btn-primary me-2">
+                          <button
+                            className="btn btn-primary me-2"
+                            onClick={handleEdit}
+                          >
                             حفظ
                           </button>
                           <button
@@ -507,7 +518,7 @@ const FormSubmit = () => {
             </div>
           </Modal>
         )}
-      </MDBContainer>
+      </MDBContainer >
     </>
   );
 };
