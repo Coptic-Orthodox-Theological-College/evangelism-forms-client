@@ -6,7 +6,7 @@ export const openNotificationWithIcon = (type, header, message) => {
     description: message,
   });
   notification.config({
-    duration: 5,
+    duration: 3,
     rtl: true,
     maxCount: 3,
     closable: false,

@@ -76,6 +76,7 @@ const FormTemplates = () => {
         return;
       } else {
         setAllFormTemplates(response1.formTemplates);
+        setShowDeleteModal(false);
       }
     }
   }
