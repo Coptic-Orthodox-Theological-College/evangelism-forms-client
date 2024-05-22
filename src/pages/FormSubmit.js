@@ -6,6 +6,8 @@ import { openNotificationWithIcon } from '../utils/notification';
 import { deleteSubmission, getOneSubmission, submitForm, updateSubmission } from '../apis/formSubmit';
 import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'antd';
+import { faAdd } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const FormSubmit = () => {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const FormSubmit = () => {
   const [submmitedAlready, setSubmmitedAlready] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [numberOfSubFields, setNumberOfSubFields] = useState([])
 
   useEffect(() => {
     (async () => {
@@ -64,7 +67,6 @@ const FormSubmit = () => {
       fieldId,
       value: e.target.value
     };
-    console.log("🚀 ~ handleInputChange ~ newObject:", newObject)
     if (submmitedAlready) {
       const fieldIndex = formSubmmitedData.data.findIndex(item => item.fieldId === fieldId);
       if (fieldIndex === -1) {
@@ -85,6 +87,109 @@ const FormSubmit = () => {
       setFormSubmitData((prevData) => [...prevData.filter(item => item.fieldId !== fieldId), newObject]);
     }
   };
+
+  const handleNumberFieldChange = (e, fieldId, field) => {
+    const value = e.target.value;
+    const numericValue = parseInt(value, 10);
+
+    if (!isNaN(numericValue)) {
+      if (numericValue < 0) {
+        openNotificationWithIcon('error', 'خطأ', 'الرقم يجب أن يكون أكبر من 0');
+        e.target.value = 0;
+        return;
+      }
+
+      if (numericValue > field.ifNumber.maxNumber) {
+        openNotificationWithIcon('error', 'خطأ', `الرقم يجب أن يكون أقل من ${field.ifNumber.maxNumber}`);
+        e.target.value = field.ifNumber.maxNumber;
+        return;
+      }
+
+      const existingNumberData = formSubmitData.find((item) => item.fieldId === fieldId);
+      if (existingNumberData) {
+        setFormSubmitData((prevData) => [
+          ...prevData.filter((item) => item.fieldId !== fieldId),
+          {
+            fieldId,
+            value: `${numericValue}`,
+          },
+        ]);
+      } else {
+        setFormSubmitData((prevData) => [
+          ...prevData,
+          {
+            fieldId,
+            value: `${numericValue}`,
+          },
+        ]);
+      }
+    } else {
+      e.target.value = '';
+    }
+  };
+
+  const handleSubNumberFieldChange = (e, fieldId, index, teamIndex) => {
+    const value = e.target.value;
+    const existingData = formSubmitData.find((item) => item.fieldId === fieldId);
+
+    if (existingData) {
+      let indexValue = `${teamIndex + 1}.${index + 1}:`;
+      let newValue = `${teamIndex + 1}.${index + 1}:${value}`;
+      const indexValueExists = existingData.value.split(',').find((item) => item.includes(indexValue)) ? true : false;
+
+      if (indexValueExists) {
+        const oldValue = existingData.value.split(',').find((item) => item.includes(indexValue));
+        const updatedValue = existingData.value.replace(oldValue, newValue);
+        setFormSubmitData((prevData) => [
+          ...prevData.filter((item) => item.fieldId !== fieldId),
+          {
+            fieldId,
+            value: updatedValue,
+          },
+        ]);
+      } else {
+        setFormSubmitData((prevData) => [
+          ...prevData.filter((item) => item.fieldId !== fieldId),
+          {
+            fieldId,
+            value: `${existingData.value},${newValue}`,
+          },
+        ]);
+      }
+    }
+  };
+
+  const handleAddSubNumberField = (teamIndex, minRequiredNames, maxRequiredNames, fieldId) => {
+    const existingData = numberOfSubFields.find((item) => item.teamIndex === teamIndex);
+
+    if (existingData) {
+      if (existingData.value >= maxRequiredNames) {
+        openNotificationWithIcon('error', 'خطأ', `لا يمكنك إضافة المزيد من الأسماء`);
+        return;
+      }
+
+      const updatedData = numberOfSubFields.map((item) => {
+        if (item.teamIndex === teamIndex) {
+          return {
+            teamIndex,
+            value: existingData.value + 1,
+          };
+        }
+        return item;
+      });
+
+      setNumberOfSubFields(updatedData);
+    } else {
+      setNumberOfSubFields((prevData) => [
+        ...prevData,
+        {
+          teamIndex,
+          value: minRequiredNames + 1,
+        },
+      ]);
+    }
+  };
+
   // TODO: we need to update numberOfChoices to (maxNumberOfChoices) and (minNumberOfChoices) to handle the case of multiple choices
   const handleCheckboxChange = (e, fieldId, numberOfChoices) => {
     if (submmitedAlready) {
@@ -215,10 +320,11 @@ const FormSubmit = () => {
     const response = await submitForm(formSubmitData, FormTemplateId, token);
     if (response.success) {
       openNotificationWithIcon('success', 'نجاح', 'تم تقديم النموذج بنجاح');
+      navigate('/church');
     } else {
       openNotificationWithIcon('error', 'خطأ', response.message);
+      return;
     }
-    navigate('/');
   }
 
   const handleEdit = async (e) => {
@@ -257,7 +363,9 @@ const FormSubmit = () => {
               numberOfChoices (if isEnum is true): number of choices
               values (if isEnum is true): array of choices
        */}
-      <MDBContainer>
+      <MDBContainer style={{
+        marginBottom: '5rem',
+      }}>
         <h1 className="text-center mt-5">
           استمارة {formTemplateData?.name}
         </h1>
@@ -278,6 +386,7 @@ const FormSubmit = () => {
                         <div key={index} className="mb-3">
                           <label htmlFor={`field-${index}`} className="form-label">
                             {field.name}
+                            {field.ifNumber.price && (<small> - {field.ifNumber.price} جنيه</small>)}
                           </label>
                           <>
                             {field.isEnum ? (
@@ -413,7 +522,10 @@ const FormSubmit = () => {
                       .sort((a, b) => a.order - b.order) // sort by order
                       .map((field, index) => (
                         <div key={index} className="mb-3">
-                          <label htmlFor={`field-${`index`}`} className="form-label">{field.name}</label>
+                          <label htmlFor={`field-${`index`}`} className="form-label">
+                            {field.name}
+                            {field.ifNumber.price && (<small> {field.ifNumber.price}{"x"} جنية</small>)}
+                          </label>
                           <>
                             {field.isEnum ? (
                               <>
@@ -457,23 +569,152 @@ const FormSubmit = () => {
                               </>
                             ) : (
                               <>
-                                <input
-                                  type='text'
-                                  className="form-control"
-                                  id={`field-${index}`}
-                                  placeholder={field.description}
-                                  required={field.isRequired}
-                                  onChange={(e) => {
-                                    handleInputChange(e, field._id);
-                                  }}
-                                />
+                                {field.isNumber ? (
+                                  <>
+                                    <div style={{
+                                      display: 'flex',
+                                      gap: '2rem',
+                                      alignItems: 'center',
+                                    }}>
+                                      <input
+                                        type="number"
+                                        className="form-control"
+                                        id={`field-${index}`}
+                                        placeholder={field.description}
+                                        required={field.isRequired}
+                                        style={{
+                                          width: 'fit-content',
+                                        }}
+                                        onChange={(e) => {
+                                          handleNumberFieldChange(e, field._id, field);
+                                        }}
+                                        // not editubule if the number is more than maxNumber and if user type if the number is more than maxNumber it will not be saved
+                                        max={field.ifNumber.maxNumber}
+                                      />
+                                      <div style={{
+                                        color: "#005300",
+                                      }}>
+                                        {field.ifNumber.price && (
+                                          <>
+                                            {formSubmitData.find((item) => item.fieldId === field._id)?.value.split(',')[0] ?
+                                              field.ifNumber.price * formSubmitData.find((item) => item.fieldId === field._id)?.value.split(',')[0] : 0
+                                            } جنيه
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {field.ifNumber.maxRequiredNames !== 0 &&
+                                      formSubmitData
+                                        .find((item) => item.fieldId === field._id)
+                                        ?.value.split(',')[0] > 0 && (
+                                        <>
+                                          {Array.from(
+                                            Array(
+                                              parseInt(
+                                                formSubmitData.find((item) => item.fieldId === field._id)?.value
+                                                  .split(',')[0],
+                                                10
+                                              )
+                                            ),
+                                            (_, teamIndex) => (
+                                              <div key={teamIndex} style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '1rem',
+                                                margin: '1rem',
+                                              }}>
+                                                <h5>{field.ifNumber.nameTitle} {teamIndex + 1}</h5>
+                                                <div
+                                                  style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    flexWrap: 'wrap',
+                                                    alignItems: 'center',
+                                                    alignContent: 'center',
+                                                    gap: '2rem',
+                                                    justifyContent: 'flex-start',
+                                                  }}
+                                                >
+                                                  {Array.from(
+                                                    Array(
+                                                      (numberOfSubFields.find((item) => item.teamIndex === teamIndex)?.value)
+                                                      ||
+                                                      field.ifNumber.minRequiredNames
+                                                    ),
+                                                    (_, i) => (
+                                                      <div key={i}>
+                                                        <input
+                                                          type="text"
+                                                          className="form-control"
+                                                          placeholder={`ادخل اسم`}
+                                                          value={
+                                                            formSubmitData.find((item) => item.fieldId === field._id)
+                                                              ?.value.split(',')
+                                                              .find((item) => item.includes(`${teamIndex + 1}.${i + 1}:`))
+                                                              ?.split(':')[1] || ''
+                                                          }
+                                                          onChange={(e) =>
+                                                            handleSubNumberFieldChange(
+                                                              e,
+                                                              field._id,
+                                                              i,
+                                                              teamIndex
+                                                            )
+                                                          }
+                                                        />
+                                                      </div>
+                                                    )
+                                                  )}
+                                                </div>
+                                                {(
+                                                  (
+                                                    numberOfSubFields.find((item) => item.teamIndex === teamIndex)?.value ||
+                                                    field.ifNumber.minRequiredNames
+                                                  ) < field.ifNumber.maxRequiredNames ? (
+                                                    <Button
+                                                      onClick={() =>
+                                                        handleAddSubNumberField(
+                                                          teamIndex,
+                                                          field.ifNumber.minRequiredNames,
+                                                          field.ifNumber.maxRequiredNames,
+                                                          field._id
+                                                        )}
+                                                      style={{
+                                                        backgroundColor: '#004d00',
+                                                        color: 'white',
+                                                        width: '150px',
+                                                      }}
+                                                    >
+                                                      <FontAwesomeIcon icon={faAdd} />
+                                                    </Button>
+                                                  ) : null)}
+                                              </div>
+                                            )
+                                          )}
+                                        </>
+                                      )}
+                                  </>
+                                ) : (
+                                  <>
+                                    <input
+                                      type='text'
+                                      className="form-control"
+                                      id={`field-${index}`}
+                                      placeholder={field.description}
+                                      required={field.isRequired}
+                                      onChange={(e) => {
+                                        handleInputChange(e, field._id);
+                                      }}
+                                    />
+                                  </>
+                                )}
                               </>
                             )}
                           </>
                         </div>
                       ))}
                     <div className="d-flex justify-content-center">
-                      <button type="submit" className="btn btn-primary">Submit</button>
+                      <button type="submit" className="btn btn-primary mt-5">حفظ</button>
                     </div>
                   </form>
                 </>
