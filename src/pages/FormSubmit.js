@@ -646,7 +646,13 @@ const FormSubmit = () => {
                                                         <input
                                                           type="text"
                                                           className="form-control"
-                                                          placeholder={`ادخل اسم`}
+                                                          placeholder=
+                                                          {
+                                                            (
+                                                              (numberOfSubFields.find((item) => item.teamIndex === teamIndex)?.value)
+                                                              ||
+                                                              field.ifNumber.minRequiredNames) > 1 ? (`ادخل اسم ${i + 1}`) : (`ادخل الاسم`)
+                                                          }
                                                           value={
                                                             formSubmitData.find((item) => item.fieldId === field._id)
                                                               ?.value.split(',')
