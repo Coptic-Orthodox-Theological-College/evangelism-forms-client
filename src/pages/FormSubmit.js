@@ -386,7 +386,6 @@ const FormSubmit = () => {
                         <div key={index} className="mb-3">
                           <label htmlFor={`field-${index}`} className="form-label">
                             {field.name}
-                            {field.ifNumber.price && (<small> - {field.ifNumber.price} جنيه</small>)}
                           </label>
                           <>
                             {field.isEnum ? (
@@ -524,7 +523,7 @@ const FormSubmit = () => {
                         <div key={index} className="mb-3">
                           <label htmlFor={`field-${`index`}`} className="form-label">
                             {field.name}
-                            {field.ifNumber.price && (<small> {field.ifNumber.price}{"x"} جنية</small>)}
+                            {field.ifNumber?.price && (<small> {field.ifNumber.price}{"x"} جنية</small>)}
                           </label>
                           <>
                             {field.isEnum ? (
