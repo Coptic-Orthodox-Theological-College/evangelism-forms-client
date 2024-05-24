@@ -160,7 +160,11 @@ const FormSubmit = () => {
   };
 
   const handleAddSubNumberField = (teamIndex, minRequiredNames, maxRequiredNames, fieldId) => {
-    const existingData = numberOfSubFields.find((item) => item.teamIndex === teamIndex);
+    const existingData = numberOfSubFields.find((item) => {
+      if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
+        return item;
+      }
+    });
 
     if (existingData) {
       if (existingData.value >= maxRequiredNames) {
@@ -169,8 +173,9 @@ const FormSubmit = () => {
       }
 
       const updatedData = numberOfSubFields.map((item) => {
-        if (item.teamIndex === teamIndex) {
+        if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
           return {
+            fieldId,
             teamIndex,
             value: existingData.value + 1,
           };
@@ -183,6 +188,7 @@ const FormSubmit = () => {
       setNumberOfSubFields((prevData) => [
         ...prevData,
         {
+          fieldId,
           teamIndex,
           value: minRequiredNames + 1,
         },
@@ -636,7 +642,9 @@ const FormSubmit = () => {
                                                 >
                                                   {Array.from(
                                                     Array(
-                                                      (numberOfSubFields.find((item) => item.teamIndex === teamIndex)?.value)
+                                                      (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                        && item.fieldId === field._id
+                                                      )?.value)
                                                       ||
                                                       field.ifNumber.minRequiredNames
                                                     ),
@@ -648,7 +656,9 @@ const FormSubmit = () => {
                                                           placeholder=
                                                           {
                                                             (
-                                                              (numberOfSubFields.find((item) => item.teamIndex === teamIndex)?.value)
+                                                              (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                                && item.fieldId === field._id
+                                                              )?.value)
                                                               ||
                                                               field.ifNumber.minRequiredNames) > 1 ? (`ادخل اسم ${i + 1}`) : (`ادخل الاسم`)
                                                           }
@@ -673,7 +683,8 @@ const FormSubmit = () => {
                                                 </div>
                                                 {(
                                                   (
-                                                    numberOfSubFields.find((item) => item.teamIndex === teamIndex)?.value ||
+                                                    numberOfSubFields.find((item) => item.teamIndex === teamIndex &&
+                                                      item.fieldId === field._id)?.value ||
                                                     field.ifNumber.minRequiredNames
                                                   ) < field.ifNumber.maxRequiredNames ? (
                                                     <Button
