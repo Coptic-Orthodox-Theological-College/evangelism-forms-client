@@ -50,7 +50,14 @@ const Activities = () => {
               <div className="continer-activities" style={{ marginTop: "6rem" }}>
                 {allActivities.map((activity, index) => (
                   <MDBCol key={index}>
-                    <div className="sub-titlebaground" onClick={() => navigate(`/form-templates/${activity._id}`)}>
+                    <div className="sub-titlebaground" onClick={() => {
+                      if (activity.ifHaveOneForm) {
+                        navigate(`/form-submit/${activity.ifHaveOneForm}`)
+                      } else {
+                        navigate(`/form-templates/${activity._id}`)
+                      }
+                    }
+                    }>
                       <div style={{ color: "white", fontSize: "1.5em", textDecoration: 'none' }}>
                         {activity.name}
                         <br />
