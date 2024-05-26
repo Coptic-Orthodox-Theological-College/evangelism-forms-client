@@ -8,8 +8,8 @@ export const openNotificationWithIcon = (type, header, message) => {
   notification.config({
     duration: 3,
     rtl: true,
-    maxCount: 3,
-    closable: false,
+    maxCount: 2,
+    closable: true,
     placement: 'topRight',
   });
 };

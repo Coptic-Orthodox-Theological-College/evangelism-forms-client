@@ -52,7 +52,7 @@ const Activities = () => {
                   <MDBCol key={index}>
                     <div className="sub-titlebaground" onClick={() => {
                       if (activity.ifHaveOneForm) {
-                        navigate(`/form-submit/${activity.ifHaveOneForm}`)
+                        navigate(`/form-submit/${activity.ifHaveOneForm._id}`)
                       } else {
                         navigate(`/form-templates/${activity._id}`)
                       }
