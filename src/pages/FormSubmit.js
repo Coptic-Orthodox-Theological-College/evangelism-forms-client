@@ -24,6 +24,7 @@ const FormSubmit = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [numberOfSubFields, setNumberOfSubFields] = useState([])
+  const [totalPrice, setTotalPrice] = useState(0)
 
   useEffect(() => {
     (async () => {
@@ -62,6 +63,20 @@ const FormSubmit = () => {
     getSubmission();
   }, [submitionId]);
 
+  useEffect(() => {
+    const handleTotalPrice = () => {
+      let totalPriceValue = 0;
+      formSubmitData.forEach((item) => {
+        const field = formFieldsData.find((field) => field._id === item.fieldId);
+        if (field.isNumber) {
+          totalPriceValue += field.ifNumber.price * Number(item.value.split(',')[0])
+        }
+      });
+      setTotalPrice(totalPriceValue);
+    }
+    handleTotalPrice();
+  }, [formSubmitData]);
+
   const handleInputChange = (e, fieldId) => {
     const newObject = {
       fieldId,
@@ -94,14 +109,27 @@ const FormSubmit = () => {
 
     if (!isNaN(numericValue)) {
       if (numericValue < 0) {
-        openNotificationWithIcon('error', 'خطأ', 'الرقم يجب أن يكون أكبر من 0');
         e.target.value = 0;
+        setFormSubmitData((prevData) => [
+          ...prevData.filter((item) => item.fieldId !== fieldId),
+          {
+            fieldId,
+            value: `0`,
+          },
+        ]);
         return;
       }
 
       if (numericValue > field.ifNumber.maxNumber) {
         openNotificationWithIcon('error', 'خطأ', `الرقم يجب أن يكون أقل من ${field.ifNumber.maxNumber}`);
         e.target.value = field.ifNumber.maxNumber;
+        setFormSubmitData((prevData) => [
+          ...prevData.filter((item) => item.fieldId !== fieldId),
+          {
+            fieldId,
+            value: `${field.ifNumber.maxNumber}`,
+          },
+        ]);
         return;
       }
 
@@ -123,8 +151,23 @@ const FormSubmit = () => {
           },
         ]);
       }
+    } else if (value === '') {
+      setFormSubmitData((prevData) => [
+        ...prevData.filter((item) => item.fieldId !== fieldId),
+        {
+          fieldId,
+          value: `0`,
+        },
+      ]);
     } else {
-      e.target.value = '';
+      e.target.value = 0;
+      setFormSubmitData((prevData) => [
+        ...prevData.filter((item) => item.fieldId !== fieldId),
+        {
+          fieldId,
+          value: `0`,
+        },
+      ]);
     }
   };
 
@@ -593,7 +636,6 @@ const FormSubmit = () => {
                                         onChange={(e) => {
                                           handleNumberFieldChange(e, field._id, field);
                                         }}
-                                        // not editubule if the number is more than maxNumber and if user type if the number is more than maxNumber it will not be saved
                                         max={field.ifNumber.maxNumber}
                                       />
                                       <div style={{
@@ -608,107 +650,112 @@ const FormSubmit = () => {
                                         )}
                                       </div>
                                     </div>
-                                    {field.ifNumber.maxRequiredNames !== 0 &&
-                                      formSubmitData
-                                        .find((item) => item.fieldId === field._id)
-                                        ?.value.split(',')[0] > 0 && (
-                                        <>
-                                          {Array.from(
-                                            Array(
-                                              parseInt(
-                                                formSubmitData.find((item) => item.fieldId === field._id)?.value
-                                                  .split(',')[0],
-                                                10
-                                              )
-                                            ),
-                                            (_, teamIndex) => (
-                                              <div key={teamIndex} style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: '1rem',
-                                                margin: '1rem',
-                                              }}>
-                                                <h5>{field.ifNumber.nameTitle} {teamIndex + 1}</h5>
-                                                <div
-                                                  style={{
-                                                    display: 'flex',
-                                                    flexDirection: 'row',
-                                                    flexWrap: 'wrap',
-                                                    alignItems: 'center',
-                                                    alignContent: 'center',
-                                                    gap: '2rem',
-                                                    justifyContent: 'flex-start',
-                                                  }}
-                                                >
-                                                  {Array.from(
-                                                    Array(
-                                                      (numberOfSubFields.find((item) => item.teamIndex === teamIndex
-                                                        && item.fieldId === field._id
-                                                      )?.value)
-                                                      ||
+                                    <div style={{
+                                      display: "flex",
+                                      flexWrap: "wrap",
+                                    }}>
+                                      {field.ifNumber.maxRequiredNames !== 0 &&
+                                        formSubmitData
+                                          .find((item) => item.fieldId === field._id)
+                                          ?.value.split(',')[0] > 0 && (
+                                          <>
+                                            {Array.from(
+                                              Array(
+                                                parseInt(
+                                                  formSubmitData.find((item) => item.fieldId === field._id)?.value
+                                                    .split(',')[0],
+                                                  10
+                                                )
+                                              ),
+                                              (_, teamIndex) => (
+                                                <div key={teamIndex} style={{
+                                                  display: 'flex',
+                                                  flexDirection: 'column',
+                                                  gap: '1rem',
+                                                  margin: '1rem',
+                                                }}>
+                                                  <span>{field.ifNumber.nameTitle} {teamIndex + 1}</span>
+                                                  <div
+                                                    style={{
+                                                      display: 'flex',
+                                                      flexDirection: 'row',
+                                                      flexWrap: 'wrap',
+                                                      alignItems: 'center',
+                                                      alignContent: 'center',
+                                                      gap: '2rem',
+                                                      justifyContent: 'flex-start',
+                                                    }}
+                                                  >
+                                                    {Array.from(
+                                                      Array(
+                                                        (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                          && item.fieldId === field._id
+                                                        )?.value)
+                                                        ||
+                                                        field.ifNumber.minRequiredNames
+                                                      ),
+                                                      (_, i) => (
+                                                        <div key={i}>
+                                                          <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder=
+                                                            {
+                                                              (
+                                                                (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                                  && item.fieldId === field._id
+                                                                )?.value)
+                                                                ||
+                                                                field.ifNumber.minRequiredNames) > 1 ? (`ادخل اسم ${i + 1}`) : (`ادخل الاسم`)
+                                                            }
+                                                            value={
+                                                              formSubmitData.find((item) => item.fieldId === field._id)
+                                                                ?.value.split(',')
+                                                                .find((item) => item.includes(`${teamIndex + 1}.${i + 1}:`))
+                                                                ?.split(':')[1] || ''
+                                                            }
+                                                            onChange={(e) =>
+                                                              handleSubNumberFieldChange(
+                                                                e,
+                                                                field._id,
+                                                                i,
+                                                                teamIndex
+                                                              )
+                                                            }
+                                                          />
+                                                        </div>
+                                                      )
+                                                    )}
+                                                  </div>
+                                                  {(
+                                                    (
+                                                      numberOfSubFields.find((item) => item.teamIndex === teamIndex &&
+                                                        item.fieldId === field._id)?.value ||
                                                       field.ifNumber.minRequiredNames
-                                                    ),
-                                                    (_, i) => (
-                                                      <div key={i}>
-                                                        <input
-                                                          type="text"
-                                                          className="form-control"
-                                                          placeholder=
-                                                          {
-                                                            (
-                                                              (numberOfSubFields.find((item) => item.teamIndex === teamIndex
-                                                                && item.fieldId === field._id
-                                                              )?.value)
-                                                              ||
-                                                              field.ifNumber.minRequiredNames) > 1 ? (`ادخل اسم ${i + 1}`) : (`ادخل الاسم`)
-                                                          }
-                                                          value={
-                                                            formSubmitData.find((item) => item.fieldId === field._id)
-                                                              ?.value.split(',')
-                                                              .find((item) => item.includes(`${teamIndex + 1}.${i + 1}:`))
-                                                              ?.split(':')[1] || ''
-                                                          }
-                                                          onChange={(e) =>
-                                                            handleSubNumberFieldChange(
-                                                              e,
-                                                              field._id,
-                                                              i,
-                                                              teamIndex
-                                                            )
-                                                          }
-                                                        />
-                                                      </div>
-                                                    )
-                                                  )}
+                                                    ) < field.ifNumber.maxRequiredNames ? (
+                                                      <Button
+                                                        onClick={() =>
+                                                          handleAddSubNumberField(
+                                                            teamIndex,
+                                                            field.ifNumber.minRequiredNames,
+                                                            field.ifNumber.maxRequiredNames,
+                                                            field._id
+                                                          )}
+                                                        style={{
+                                                          backgroundColor: '#004d00',
+                                                          color: 'white',
+                                                          width: '150px',
+                                                        }}
+                                                      >
+                                                        <FontAwesomeIcon icon={faAdd} />
+                                                      </Button>
+                                                    ) : null)}
                                                 </div>
-                                                {(
-                                                  (
-                                                    numberOfSubFields.find((item) => item.teamIndex === teamIndex &&
-                                                      item.fieldId === field._id)?.value ||
-                                                    field.ifNumber.minRequiredNames
-                                                  ) < field.ifNumber.maxRequiredNames ? (
-                                                    <Button
-                                                      onClick={() =>
-                                                        handleAddSubNumberField(
-                                                          teamIndex,
-                                                          field.ifNumber.minRequiredNames,
-                                                          field.ifNumber.maxRequiredNames,
-                                                          field._id
-                                                        )}
-                                                      style={{
-                                                        backgroundColor: '#004d00',
-                                                        color: 'white',
-                                                        width: '150px',
-                                                      }}
-                                                    >
-                                                      <FontAwesomeIcon icon={faAdd} />
-                                                    </Button>
-                                                  ) : null)}
-                                              </div>
-                                            )
-                                          )}
-                                        </>
-                                      )}
+                                              )
+                                            )}
+                                          </>
+                                        )}
+                                    </div>
                                   </>
                                 ) : (
                                   <>
@@ -729,8 +776,24 @@ const FormSubmit = () => {
                           </>
                         </div>
                       ))}
+                    {totalPrice > 0 ? (
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: '2rem',
+                      }}>
+                        <span>السعر الإجمالي: {" "}
+                          <span style={{
+                            color: '#005300',
+                          }}>
+                            {totalPrice} جنيه
+                          </span>
+                        </span>
+                      </div>
+                    ) : null}
                     <div className="d-flex justify-content-center">
-                      <button type="submit" className="btn btn-primary mt-5">حفظ</button>
+                      <button type="submit" className="btn btn-primary mt-4">حفظ</button>
                     </div>
                   </form>
                 </>
