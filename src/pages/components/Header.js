@@ -31,8 +31,11 @@ const Header = ({ churchData }) => {
 
   return (
     <MDBNavbar expand='lg' light bgColor='light' dir='rtl' >
-      <MDBNavbarBrand href='/home'>
-        <img src={logo} alt='logo' loading='lazy' className='logo-header' />
+      <MDBNavbarBrand>
+        <img src={logo} alt='logo' loading='lazy' className='logo-header' onClick={() => navigate('/home')} />
+        {churchData && (
+          <MDBNavbarLink onClick={() => window.location.href = `/church`}>{churchData.name}</MDBNavbarLink>
+        )}
       </MDBNavbarBrand>
       <MDBNavbarToggler
         type='button'
@@ -47,11 +50,6 @@ const Header = ({ churchData }) => {
       }}>
         <MDBNavbarNav>
           <MDBNavbarItem>
-            <MDBNavbarLink active aria-current='page' href='#'>
-              الرئيسية
-            </MDBNavbarLink>
-          </MDBNavbarItem>
-          <MDBNavbarItem>
             <MDBNavbarLink href='#'>من نحن</MDBNavbarLink>
           </MDBNavbarItem>
           <MDBNavbarItem>
@@ -60,11 +58,6 @@ const Header = ({ churchData }) => {
           <MDBNavbarItem>
             <MDBNavbarLink href='#'>تواصل معنا</MDBNavbarLink>
           </MDBNavbarItem>
-          {churchData && (
-            <MDBNavbarItem>
-              <MDBNavbarLink onClick={() => window.location.href = `/church`}>{churchData.name}</MDBNavbarLink>
-            </MDBNavbarItem>
-          )}
         </MDBNavbarNav>
         <div style={{
           marginLeft: '20px',
