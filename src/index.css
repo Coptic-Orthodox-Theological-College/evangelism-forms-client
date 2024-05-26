@@ -286,3 +286,8 @@ body {
   height: 30vw;
   max-height: 80px;
 }
+
+.form-label {
+  font-size: 1.2rem;
+  font-weight: 600;
+}

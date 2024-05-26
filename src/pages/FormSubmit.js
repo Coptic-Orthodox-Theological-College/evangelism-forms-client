@@ -674,7 +674,13 @@ const FormSubmit = () => {
                                                   gap: '1rem',
                                                   margin: '1rem',
                                                 }}>
-                                                  <span>{field.ifNumber.nameTitle} {teamIndex + 1}</span>
+                                                  <span style={{
+                                                    color: 'rgba(0,0,0,.6)',
+                                                    marginBottom: '-10px',
+                                                  }}
+                                                  >{field.ifNumber.nameTitle} {teamIndex + 1} {" "}
+                                                    {formFieldsData.length > 1 && <small>({field.name})</small>}
+                                                  </span>
                                                   <div
                                                     style={{
                                                       display: 'flex',
