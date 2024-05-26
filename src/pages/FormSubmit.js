@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'antd';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Spinner from './components/Spinner';
 
 const FormSubmit = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const FormSubmit = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [numberOfSubFields, setNumberOfSubFields] = useState([])
   const [totalPrice, setTotalPrice] = useState(0)
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -40,15 +42,18 @@ const FormSubmit = () => {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const response = await getFormTemplate(FormTemplateId);
       setFormTemplateData(response);
       setFormFieldsData(response.fields);
+      setLoading(false);
     })();
   }, [FormTemplateId]);
 
   useEffect(() => {
     async function getSubmission() {
       if (submitionId) {
+        setLoading(true);
         const tokenExists = localStorage.getItem('token') || sessionStorage.getItem('token');
         const response = await getOneSubmission(submitionId, tokenExists);
         if (response.success) {
@@ -58,6 +63,7 @@ const FormSubmit = () => {
         } else {
           openNotificationWithIcon('error', 'خطأ', response.message);
         }
+        setLoading(false);
       }
     }
     getSubmission();
@@ -412,439 +418,441 @@ const FormSubmit = () => {
               numberOfChoices (if isEnum is true): number of choices
               values (if isEnum is true): array of choices
        */}
-      <MDBContainer style={{
-        marginBottom: '5rem',
-      }}>
-        <h1 className="text-center mt-5">
-          استمارة {formTemplateData?.name}
-        </h1>
-        <MDBRow>
-          <MDBCol>
-            {submmitedAlready ?
-              (
-                <>
-                  {/* here i need to show same inputs with same fields but with values and 2 buttons one for edit and one for delete
+      {loading ? <Spinner /> :
+        <MDBContainer style={{
+          marginBottom: '5rem',
+        }}>
+          <h1 className="text-center mt-5">
+            استمارة {formTemplateData?.name}
+          </h1>
+          <MDBRow>
+            <MDBCol>
+              {submmitedAlready ?
+                (
+                  <>
+                    {/* here i need to show same inputs with same fields but with values and 2 buttons one for edit and one for delete
                     formSubmmitedData.data -> value and fieldId
                   */}
-                  {/* start */}
-                  <div dir="rtl" className="mt-5">
-                    {formFieldsData
-                      .slice()
-                      .sort((a, b) => a.order - b.order)
-                      .map((field, index) => (
-                        <div key={index} className="mb-3">
-                          <label htmlFor={`field-${index}`} className="form-label">
-                            {field.name}
-                          </label>
-                          <>
-                            {field.isEnum ? (
-                              <>
-                                {field.numberOfChoices > 1 ? (
-                                  <>
-                                    {field.values.map((value, valueIndex) => (
-                                      <div key={valueIndex} className="form-check form-check-inline">
-                                        <input
-                                          className="form-check-input"
-                                          type="checkbox"
-                                          name={`field-${index}-${valueIndex}`}
-                                          id={`field-${index}-${valueIndex}`}
-                                          value={value}
-                                          checked={
-                                            formSubmmitedData.data
-                                              .filter((item) => item.fieldId === field._id)
-                                              .some((item) => item.value.split(',').includes(value))}
-                                          onChange={(e) => {
-                                            if (isEditing) {
-                                              handleCheckboxChange(e, field._id, field.numberOfChoices);
-                                            }
-                                          }}
-                                          disabled={!isEditing}
-                                        />
-                                        <label className="form-check-label" htmlFor={`field-${index}-${valueIndex}`}>
-                                          {value}
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </>
-                                ) : (
-                                  <>
-                                    <select
-                                      className="form-select"
-                                      id={`field-${index}`}
-                                      required={field.isRequired}
-                                      value={
-                                        formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value || ''
-                                      }
-                                      onChange={(e) => {
-                                        if (isEditing) {
-                                          handleInputChange(e, field._id);
+                    {/* start */}
+                    <div dir="rtl" className="mt-5">
+                      {formFieldsData
+                        .slice()
+                        .sort((a, b) => a.order - b.order)
+                        .map((field, index) => (
+                          <div key={index} className="mb-3">
+                            <label htmlFor={`field-${index}`} className="form-label">
+                              {field.name}
+                            </label>
+                            <>
+                              {field.isEnum ? (
+                                <>
+                                  {field.numberOfChoices > 1 ? (
+                                    <>
+                                      {field.values.map((value, valueIndex) => (
+                                        <div key={valueIndex} className="form-check form-check-inline">
+                                          <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            name={`field-${index}-${valueIndex}`}
+                                            id={`field-${index}-${valueIndex}`}
+                                            value={value}
+                                            checked={
+                                              formSubmmitedData.data
+                                                .filter((item) => item.fieldId === field._id)
+                                                .some((item) => item.value.split(',').includes(value))}
+                                            onChange={(e) => {
+                                              if (isEditing) {
+                                                handleCheckboxChange(e, field._id, field.numberOfChoices);
+                                              }
+                                            }}
+                                            disabled={!isEditing}
+                                          />
+                                          <label className="form-check-label" htmlFor={`field-${index}-${valueIndex}`}>
+                                            {value}
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <select
+                                        className="form-select"
+                                        id={`field-${index}`}
+                                        required={field.isRequired}
+                                        value={
+                                          formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value || ''
                                         }
-                                      }}
-                                      disabled={!isEditing}
-                                    >
-                                      <option value="">Select an option</option>
-                                      {field.values.map((value, valueIndex) => (
-                                        <option key={valueIndex} value={value}>
-                                          {value}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  id={`field-${index}`}
-                                  placeholder={field.description}
-                                  required={field.isRequired}
-                                  value={
-                                    formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value || ''
-                                  }
-                                  onChange={(e) => {
-                                    if (isEditing) {
-                                      handleInputChange(e, field._id);
+                                        onChange={(e) => {
+                                          if (isEditing) {
+                                            handleInputChange(e, field._id);
+                                          }
+                                        }}
+                                        disabled={!isEditing}
+                                      >
+                                        <option value="">Select an option</option>
+                                        {field.values.map((value, valueIndex) => (
+                                          <option key={valueIndex} value={value}>
+                                            {value}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    id={`field-${index}`}
+                                    placeholder={field.description}
+                                    required={field.isRequired}
+                                    value={
+                                      formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value || ''
                                     }
-                                  }}
-                                  disabled={!isEditing}
-                                />
-                              </>
-                            )}
-                          </>
-                        </div>
-                      ))}
-                    <div className="d-flex justify-content-center">
-                      {isEditing ? (
-                        <div
-                          style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}
-                        >
-                          <button
-                            className="btn btn-primary me-2"
-                            onClick={handleEdit}
-                          >
-                            حفظ
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={() => {
-                              setIsEditing(false)
-                              setFormSubmmitedData(formSubmmitedDataTemp)
-                            }}
-                          >
-                            إلغاء
-                          </button>
-                        </div>
-                      ) : (
-                        <div
-                          style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}
-                        >
-                          <button
-                            type="button"
-                            className="btn btn-warning"
-                            onClick={() => setIsEditing(true)}
-                          >
-                            تعديل
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-danger ms-2"
-                            onClick={() => setShowDeleteModal(true)}
-                          >
-                            حذف
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {/* end */}
-                </>
-              ) : (
-                <>
-                  {/* i dont need form to go anyware i wll handle it  */}
-                  <form dir='rtl' onSubmit={handleSubmit} className="mt-5">
-                    {formFieldsData
-                      .slice() // create a shallow copy to avoid mutating the original array
-                      .sort((a, b) => a.order - b.order) // sort by order
-                      .map((field, index) => (
-                        <div key={index} className="mb-3">
-                          <label htmlFor={`field-${`index`}`} className="form-label">
-                            {field.name}
-                            {field.ifNumber?.price && (<small> {field.ifNumber.price}{"x"} جنية</small>)}
-                          </label>
-                          <>
-                            {field.isEnum ? (
-                              <>
-                                {field.numberOfChoices > 1 ? (
-                                  <>
-                                    {field.values.map((value, valueIndex) => (
-                                      <div key={valueIndex} className="form-check form-check-inline">
-                                        <input
-                                          className="form-check-input"
-                                          type="checkbox"
-                                          name={`field-${index}-${valueIndex}`}
-                                          id={`field-${index}-${valueIndex}`}
-                                          value={value}
-                                          onChange={(e) => {
-                                            handleCheckboxChange(e, field._id, field.numberOfChoices);
-                                          }}
-                                        />
-                                        <label className="form-check-label" htmlFor={`field-${index}-${valueIndex}`}>{value}</label>
-                                      </div>
-                                    ))}
-                                  </>
-                                ) : (
-                                  <>
-                                    <select
-                                      className="form-select"
-                                      id={`field-${index}`}
-                                      required={field.isRequired}
-                                      onChange={(e) => {
+                                    onChange={(e) => {
+                                      if (isEditing) {
                                         handleInputChange(e, field._id);
-                                      }}
-                                    >
-                                      <option value="">Select an option</option>
+                                      }
+                                    }}
+                                    disabled={!isEditing}
+                                  />
+                                </>
+                              )}
+                            </>
+                          </div>
+                        ))}
+                      <div className="d-flex justify-content-center">
+                        {isEditing ? (
+                          <div
+                            style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}
+                          >
+                            <button
+                              className="btn btn-primary me-2"
+                              onClick={handleEdit}
+                            >
+                              حفظ
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-secondary"
+                              onClick={() => {
+                                setIsEditing(false)
+                                setFormSubmmitedData(formSubmmitedDataTemp)
+                              }}
+                            >
+                              إلغاء
+                            </button>
+                          </div>
+                        ) : (
+                          <div
+                            style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}
+                          >
+                            <button
+                              type="button"
+                              className="btn btn-warning"
+                              onClick={() => setIsEditing(true)}
+                            >
+                              تعديل
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-danger ms-2"
+                              onClick={() => setShowDeleteModal(true)}
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* end */}
+                  </>
+                ) : (
+                  <>
+                    {/* i dont need form to go anyware i wll handle it  */}
+                    <form dir='rtl' onSubmit={handleSubmit} className="mt-5">
+                      {formFieldsData
+                        .slice() // create a shallow copy to avoid mutating the original array
+                        .sort((a, b) => a.order - b.order) // sort by order
+                        .map((field, index) => (
+                          <div key={index} className="mb-3">
+                            <label htmlFor={`field-${`index`}`} className="form-label">
+                              {field.name}
+                              {field.ifNumber?.price && (<small> {field.ifNumber.price}{"x"} جنية</small>)}
+                            </label>
+                            <>
+                              {field.isEnum ? (
+                                <>
+                                  {field.numberOfChoices > 1 ? (
+                                    <>
                                       {field.values.map((value, valueIndex) => (
-                                        <option key={valueIndex} value={value}>
-                                          {value}
-                                        </option>
+                                        <div key={valueIndex} className="form-check form-check-inline">
+                                          <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            name={`field-${index}-${valueIndex}`}
+                                            id={`field-${index}-${valueIndex}`}
+                                            value={value}
+                                            onChange={(e) => {
+                                              handleCheckboxChange(e, field._id, field.numberOfChoices);
+                                            }}
+                                          />
+                                          <label className="form-check-label" htmlFor={`field-${index}-${valueIndex}`}>{value}</label>
+                                        </div>
                                       ))}
-                                    </select>
-                                  </>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                {field.isNumber ? (
-                                  <>
-                                    <div style={{
-                                      display: 'flex',
-                                      gap: '2rem',
-                                      alignItems: 'center',
-                                    }}>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <select
+                                        className="form-select"
+                                        id={`field-${index}`}
+                                        required={field.isRequired}
+                                        onChange={(e) => {
+                                          handleInputChange(e, field._id);
+                                        }}
+                                      >
+                                        <option value="">Select an option</option>
+                                        {field.values.map((value, valueIndex) => (
+                                          <option key={valueIndex} value={value}>
+                                            {value}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  {field.isNumber ? (
+                                    <>
+                                      <div style={{
+                                        display: 'flex',
+                                        gap: '2rem',
+                                        alignItems: 'center',
+                                      }}>
+                                        <input
+                                          type="number"
+                                          className="form-control"
+                                          id={`field-${index}`}
+                                          placeholder={field.description}
+                                          required={field.isRequired}
+                                          style={{
+                                            width: 'fit-content',
+                                          }}
+                                          onChange={(e) => {
+                                            handleNumberFieldChange(e, field._id, field);
+                                          }}
+                                          max={field.ifNumber.maxNumber}
+                                        />
+                                        <div style={{
+                                          color: "#005300",
+                                        }}>
+                                          {field.ifNumber.price && (
+                                            <>
+                                              {formSubmitData.find((item) => item.fieldId === field._id)?.value.split(',')[0] ?
+                                                field.ifNumber.price * formSubmitData.find((item) => item.fieldId === field._id)?.value.split(',')[0] : 0
+                                              } جنيه
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div style={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                      }}>
+                                        {field.ifNumber.maxRequiredNames !== 0 &&
+                                          formSubmitData
+                                            .find((item) => item.fieldId === field._id)
+                                            ?.value.split(',')[0] > 0 && (
+                                            <>
+                                              {Array.from(
+                                                Array(
+                                                  parseInt(
+                                                    formSubmitData.find((item) => item.fieldId === field._id)?.value
+                                                      .split(',')[0],
+                                                    10
+                                                  )
+                                                ),
+                                                (_, teamIndex) => (
+                                                  <div key={teamIndex} style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: '1rem',
+                                                    margin: '1rem',
+                                                  }}>
+                                                    <span style={{
+                                                      color: 'rgba(0,0,0,.6)',
+                                                      marginBottom: '-10px',
+                                                    }}
+                                                    >{field.ifNumber.nameTitle} {teamIndex + 1} {" "}
+                                                      {formFieldsData.length > 1 && <small>({field.name})</small>}
+                                                    </span>
+                                                    <div
+                                                      style={{
+                                                        display: 'flex',
+                                                        flexDirection: 'row',
+                                                        flexWrap: 'wrap',
+                                                        alignItems: 'center',
+                                                        alignContent: 'center',
+                                                        gap: '2rem',
+                                                        justifyContent: 'flex-start',
+                                                      }}
+                                                    >
+                                                      {Array.from(
+                                                        Array(
+                                                          (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                            && item.fieldId === field._id
+                                                          )?.value)
+                                                          ||
+                                                          field.ifNumber.minRequiredNames
+                                                        ),
+                                                        (_, i) => (
+                                                          <div key={i}>
+                                                            <input
+                                                              type="text"
+                                                              className="form-control"
+                                                              placeholder=
+                                                              {
+                                                                (
+                                                                  (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                                    && item.fieldId === field._id
+                                                                  )?.value)
+                                                                  ||
+                                                                  field.ifNumber.minRequiredNames) > 1 ? (`ادخل اسم ${i + 1}`) : (`ادخل الاسم`)
+                                                              }
+                                                              value={
+                                                                formSubmitData.find((item) => item.fieldId === field._id)
+                                                                  ?.value.split(',')
+                                                                  .find((item) => item.includes(`${teamIndex + 1}.${i + 1}:`))
+                                                                  ?.split(':')[1] || ''
+                                                              }
+                                                              onChange={(e) =>
+                                                                handleSubNumberFieldChange(
+                                                                  e,
+                                                                  field._id,
+                                                                  i,
+                                                                  teamIndex
+                                                                )
+                                                              }
+                                                            />
+                                                          </div>
+                                                        )
+                                                      )}
+                                                    </div>
+                                                    {(
+                                                      (
+                                                        numberOfSubFields.find((item) => item.teamIndex === teamIndex &&
+                                                          item.fieldId === field._id)?.value ||
+                                                        field.ifNumber.minRequiredNames
+                                                      ) < field.ifNumber.maxRequiredNames ? (
+                                                        <Button
+                                                          onClick={() =>
+                                                            handleAddSubNumberField(
+                                                              teamIndex,
+                                                              field.ifNumber.minRequiredNames,
+                                                              field.ifNumber.maxRequiredNames,
+                                                              field._id
+                                                            )}
+                                                          style={{
+                                                            backgroundColor: '#004d00',
+                                                            color: 'white',
+                                                            width: '150px',
+                                                          }}
+                                                        >
+                                                          <FontAwesomeIcon icon={faAdd} />
+                                                        </Button>
+                                                      ) : null)}
+                                                  </div>
+                                                )
+                                              )}
+                                            </>
+                                          )}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
                                       <input
-                                        type="number"
+                                        type='text'
                                         className="form-control"
                                         id={`field-${index}`}
                                         placeholder={field.description}
                                         required={field.isRequired}
-                                        style={{
-                                          width: 'fit-content',
-                                        }}
                                         onChange={(e) => {
-                                          handleNumberFieldChange(e, field._id, field);
+                                          handleInputChange(e, field._id);
                                         }}
-                                        max={field.ifNumber.maxNumber}
                                       />
-                                      <div style={{
-                                        color: "#005300",
-                                      }}>
-                                        {field.ifNumber.price && (
-                                          <>
-                                            {formSubmitData.find((item) => item.fieldId === field._id)?.value.split(',')[0] ?
-                                              field.ifNumber.price * formSubmitData.find((item) => item.fieldId === field._id)?.value.split(',')[0] : 0
-                                            } جنيه
-                                          </>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <div style={{
-                                      display: "flex",
-                                      flexWrap: "wrap",
-                                    }}>
-                                      {field.ifNumber.maxRequiredNames !== 0 &&
-                                        formSubmitData
-                                          .find((item) => item.fieldId === field._id)
-                                          ?.value.split(',')[0] > 0 && (
-                                          <>
-                                            {Array.from(
-                                              Array(
-                                                parseInt(
-                                                  formSubmitData.find((item) => item.fieldId === field._id)?.value
-                                                    .split(',')[0],
-                                                  10
-                                                )
-                                              ),
-                                              (_, teamIndex) => (
-                                                <div key={teamIndex} style={{
-                                                  display: 'flex',
-                                                  flexDirection: 'column',
-                                                  gap: '1rem',
-                                                  margin: '1rem',
-                                                }}>
-                                                  <span style={{
-                                                    color: 'rgba(0,0,0,.6)',
-                                                    marginBottom: '-10px',
-                                                  }}
-                                                  >{field.ifNumber.nameTitle} {teamIndex + 1} {" "}
-                                                    {formFieldsData.length > 1 && <small>({field.name})</small>}
-                                                  </span>
-                                                  <div
-                                                    style={{
-                                                      display: 'flex',
-                                                      flexDirection: 'row',
-                                                      flexWrap: 'wrap',
-                                                      alignItems: 'center',
-                                                      alignContent: 'center',
-                                                      gap: '2rem',
-                                                      justifyContent: 'flex-start',
-                                                    }}
-                                                  >
-                                                    {Array.from(
-                                                      Array(
-                                                        (numberOfSubFields.find((item) => item.teamIndex === teamIndex
-                                                          && item.fieldId === field._id
-                                                        )?.value)
-                                                        ||
-                                                        field.ifNumber.minRequiredNames
-                                                      ),
-                                                      (_, i) => (
-                                                        <div key={i}>
-                                                          <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            placeholder=
-                                                            {
-                                                              (
-                                                                (numberOfSubFields.find((item) => item.teamIndex === teamIndex
-                                                                  && item.fieldId === field._id
-                                                                )?.value)
-                                                                ||
-                                                                field.ifNumber.minRequiredNames) > 1 ? (`ادخل اسم ${i + 1}`) : (`ادخل الاسم`)
-                                                            }
-                                                            value={
-                                                              formSubmitData.find((item) => item.fieldId === field._id)
-                                                                ?.value.split(',')
-                                                                .find((item) => item.includes(`${teamIndex + 1}.${i + 1}:`))
-                                                                ?.split(':')[1] || ''
-                                                            }
-                                                            onChange={(e) =>
-                                                              handleSubNumberFieldChange(
-                                                                e,
-                                                                field._id,
-                                                                i,
-                                                                teamIndex
-                                                              )
-                                                            }
-                                                          />
-                                                        </div>
-                                                      )
-                                                    )}
-                                                  </div>
-                                                  {(
-                                                    (
-                                                      numberOfSubFields.find((item) => item.teamIndex === teamIndex &&
-                                                        item.fieldId === field._id)?.value ||
-                                                      field.ifNumber.minRequiredNames
-                                                    ) < field.ifNumber.maxRequiredNames ? (
-                                                      <Button
-                                                        onClick={() =>
-                                                          handleAddSubNumberField(
-                                                            teamIndex,
-                                                            field.ifNumber.minRequiredNames,
-                                                            field.ifNumber.maxRequiredNames,
-                                                            field._id
-                                                          )}
-                                                        style={{
-                                                          backgroundColor: '#004d00',
-                                                          color: 'white',
-                                                          width: '150px',
-                                                        }}
-                                                      >
-                                                        <FontAwesomeIcon icon={faAdd} />
-                                                      </Button>
-                                                    ) : null)}
-                                                </div>
-                                              )
-                                            )}
-                                          </>
-                                        )}
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <input
-                                      type='text'
-                                      className="form-control"
-                                      id={`field-${index}`}
-                                      placeholder={field.description}
-                                      required={field.isRequired}
-                                      onChange={(e) => {
-                                        handleInputChange(e, field._id);
-                                      }}
-                                    />
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </>
-                        </div>
-                      ))}
-                    {totalPrice > 0 ? (
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginTop: '2rem',
-                      }}>
-                        <span>السعر الإجمالي: {" "}
-                          <span style={{
-                            color: '#005300',
-                          }}>
-                            {totalPrice} جنيه
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </>
+                          </div>
+                        ))}
+                      {totalPrice > 0 ? (
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginTop: '2rem',
+                        }}>
+                          <span>السعر الإجمالي: {" "}
+                            <span style={{
+                              color: '#005300',
+                            }}>
+                              {totalPrice} جنيه
+                            </span>
                           </span>
-                        </span>
+                        </div>
+                      ) : null}
+                      <div className="d-flex justify-content-center">
+                        <button type="submit" className="btn btn-primary mt-4">حفظ</button>
                       </div>
-                    ) : null}
-                    <div className="d-flex justify-content-center">
-                      <button type="submit" className="btn btn-primary mt-4">حفظ</button>
-                    </div>
-                  </form>
-                </>
-              )}
-          </MDBCol>
-        </MDBRow>
-        {showDeleteModal && (
-          <Modal
-            open={showDeleteModal}
-            footer={null}
-            onCancel={() => setShowDeleteModal(false)}
-            style={{
-              direction: "rtl",
-              textAlign: "center",
-              fontFamily: "Cairo",
-              fontSize: "1.5rem",
-              minWidth: "fit-content",
-              margin: "0 auto",
-            }}
-          >
-            <h4>هل تريد حذف هذا التقديم ؟</h4>
-            <div
+                    </form>
+                  </>
+                )}
+            </MDBCol>
+          </MDBRow>
+          {showDeleteModal && (
+            <Modal
+              open={showDeleteModal}
+              footer={null}
+              onCancel={() => setShowDeleteModal(false)}
               style={{
-                padding: "1rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "1rem",
+                direction: "rtl",
+                textAlign: "center",
+                fontFamily: "Cairo",
+                fontSize: "1.5rem",
+                minWidth: "fit-content",
+                margin: "0 auto",
               }}
             >
-              <Button
-                onClick={handleDelete}
-                danger
+              <h4>هل تريد حذف هذا التقديم ؟</h4>
+              <div
+                style={{
+                  padding: "1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "1rem",
+                }}
               >
-                نعم
-              </Button>
-              <Button
-                onClick={() => setShowDeleteModal(false)}
-              >
-                لا
-              </Button>
-            </div>
-          </Modal>
-        )}
-      </MDBContainer >
+                <Button
+                  onClick={handleDelete}
+                  danger
+                >
+                  نعم
+                </Button>
+                <Button
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  لا
+                </Button>
+              </div>
+            </Modal>
+          )}
+        </MDBContainer >
+      }
     </>
   );
 };
