@@ -658,8 +658,8 @@ const FormSubmit = () => {
                                         </div>
                                       </div>
                                       <div style={{
-                                        display: "flex",
-                                        flexWrap: "wrap",
+                                        // display: "flex",
+                                        // flexWrap: "wrap",
                                       }}>
                                         {field.ifNumber.maxRequiredNames !== 0 &&
                                           formSubmitData
