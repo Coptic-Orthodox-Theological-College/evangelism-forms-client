@@ -72,16 +72,25 @@ const FormSubmit = () => {
   useEffect(() => {
     const handleTotalPrice = () => {
       let totalPriceValue = 0;
-      formSubmitData.forEach((item) => {
-        const field = formFieldsData.find((field) => field._id === item.fieldId);
-        if (field.isNumber) {
-          totalPriceValue += field.ifNumber.price * Number(item.value.split(',')[0])
-        }
-      });
+      if (submmitedAlready) {
+        formSubmmitedData.data.forEach((item) => {
+          const field = formFieldsData.find((field) => field._id === item.fieldId);
+          if (field.isNumber) {
+            totalPriceValue += field.ifNumber.price * Number(item.value.split(',')[0])
+          }
+        });
+      } else {
+        formSubmitData.forEach((item) => {
+          const field = formFieldsData.find((field) => field._id === item.fieldId);
+          if (field.isNumber) {
+            totalPriceValue += field.ifNumber.price * Number(item.value.split(',')[0])
+          }
+        });
+      }
       setTotalPrice(totalPriceValue);
     }
     handleTotalPrice();
-  }, [formSubmitData]);
+  }, [formSubmitData, formSubmmitedData, formFieldsData, submmitedAlready]);
 
   const handleInputChange = (e, fieldId) => {
     const newObject = {
@@ -113,8 +122,147 @@ const FormSubmit = () => {
     const value = e.target.value;
     const numericValue = parseInt(value, 10);
 
-    if (!isNaN(numericValue)) {
-      if (numericValue < 0) {
+    if (submmitedAlready) {
+      const existingData = formSubmmitedData.data.find((item) => item.fieldId === fieldId);
+      if (existingData) {
+        if (!isNaN(numericValue)) {
+          if (numericValue < 0) {
+            e.target.value = 0;
+            const newObject = {
+              fieldId,
+              value: `0`
+            };
+            setFormSubmmitedData((prevData) => ({
+              ...prevData,
+              data: [
+                ...prevData.data.filter(item => item.fieldId !== fieldId),
+                newObject
+              ]
+            }));
+            return;
+          }
+
+          if (numericValue > field.ifNumber.maxNumber) {
+            openNotificationWithIcon('error', 'خطأ', `الرقم يجب أن يكون أقل من ${field.ifNumber.maxNumber}`);
+            e.target.value = field.ifNumber.maxNumber;
+            const newObject = {
+              fieldId,
+              value: `${field.ifNumber.maxNumber}`
+            };
+            setFormSubmmitedData((prevData) => ({
+              ...prevData,
+              data: [
+                ...prevData.data.filter(item => item.fieldId !== fieldId),
+                newObject
+              ]
+            }));
+            return;
+          }
+
+          const existingNumberData = formSubmmitedData.data.find((item) => item.fieldId === fieldId);
+          if (existingNumberData) {
+            const newObject = {
+              fieldId,
+              value: `${numericValue}`
+            };
+            setFormSubmmitedData((prevData) => ({
+              ...prevData,
+              data: [
+                ...prevData.data.filter(item => item.fieldId !== fieldId),
+                newObject
+              ]
+            }));
+          } else {
+            const newObject = {
+              fieldId,
+              value: `${numericValue}`
+            };
+            setFormSubmmitedData((prevData) => ({
+              ...prevData,
+              data: [...prevData.data, newObject]
+            }));
+          }
+        } else if (value === '') {
+          const newObject = {
+            fieldId,
+            value: `0`
+          };
+          setFormSubmmitedData((prevData) => ({
+            ...prevData,
+            data: [
+              ...prevData.data.filter(item => item.fieldId !== fieldId),
+              newObject
+            ]
+          }));
+        } else {
+          e.target.value = 0;
+          const newObject = {
+            fieldId,
+            value: `0`
+          };
+          setFormSubmmitedData((prevData) => ({
+            ...prevData,
+            data: [
+              ...prevData.data.filter(item => item.fieldId !== fieldId),
+              newObject
+            ]
+          }));
+        }
+      }
+    } else {
+      if (!isNaN(numericValue)) {
+        if (numericValue < 0) {
+          e.target.value = 0;
+          setFormSubmitData((prevData) => [
+            ...prevData.filter((item) => item.fieldId !== fieldId),
+            {
+              fieldId,
+              value: `0`,
+            },
+          ]);
+          return;
+        }
+
+        if (numericValue > field.ifNumber.maxNumber) {
+          openNotificationWithIcon('error', 'خطأ', `الرقم يجب أن يكون أقل من ${field.ifNumber.maxNumber}`);
+          e.target.value = field.ifNumber.maxNumber;
+          setFormSubmitData((prevData) => [
+            ...prevData.filter((item) => item.fieldId !== fieldId),
+            {
+              fieldId,
+              value: `${field.ifNumber.maxNumber}`,
+            },
+          ]);
+          return;
+        }
+
+        const existingNumberData = formSubmitData.find((item) => item.fieldId === fieldId);
+        if (existingNumberData) {
+          setFormSubmitData((prevData) => [
+            ...prevData.filter((item) => item.fieldId !== fieldId),
+            {
+              fieldId,
+              value: `${numericValue}`,
+            },
+          ]);
+        } else {
+          setFormSubmitData((prevData) => [
+            ...prevData,
+            {
+              fieldId,
+              value: `${numericValue}`,
+            },
+          ]);
+        }
+      } else if (value === '') {
+        setFormSubmitData((prevData) => [
+          ...prevData.filter((item) => item.fieldId !== fieldId),
+          {
+            fieldId,
+            value: `0`,
+          },
+        ]);
+      } else {
         e.target.value = 0;
         setFormSubmitData((prevData) => [
           ...prevData.filter((item) => item.fieldId !== fieldId),
@@ -123,126 +271,155 @@ const FormSubmit = () => {
             value: `0`,
           },
         ]);
-        return;
       }
-
-      if (numericValue > field.ifNumber.maxNumber) {
-        openNotificationWithIcon('error', 'خطأ', `الرقم يجب أن يكون أقل من ${field.ifNumber.maxNumber}`);
-        e.target.value = field.ifNumber.maxNumber;
-        setFormSubmitData((prevData) => [
-          ...prevData.filter((item) => item.fieldId !== fieldId),
-          {
-            fieldId,
-            value: `${field.ifNumber.maxNumber}`,
-          },
-        ]);
-        return;
-      }
-
-      const existingNumberData = formSubmitData.find((item) => item.fieldId === fieldId);
-      if (existingNumberData) {
-        setFormSubmitData((prevData) => [
-          ...prevData.filter((item) => item.fieldId !== fieldId),
-          {
-            fieldId,
-            value: `${numericValue}`,
-          },
-        ]);
-      } else {
-        setFormSubmitData((prevData) => [
-          ...prevData,
-          {
-            fieldId,
-            value: `${numericValue}`,
-          },
-        ]);
-      }
-    } else if (value === '') {
-      setFormSubmitData((prevData) => [
-        ...prevData.filter((item) => item.fieldId !== fieldId),
-        {
-          fieldId,
-          value: `0`,
-        },
-      ]);
-    } else {
-      e.target.value = 0;
-      setFormSubmitData((prevData) => [
-        ...prevData.filter((item) => item.fieldId !== fieldId),
-        {
-          fieldId,
-          value: `0`,
-        },
-      ]);
     }
   };
 
   const handleSubNumberFieldChange = (e, fieldId, index, teamIndex) => {
     const value = e.target.value;
-    const existingData = formSubmitData.find((item) => item.fieldId === fieldId);
+    if (submmitedAlready) {
+      const existingData = formSubmmitedData.data.find((item) => item.fieldId === fieldId);
 
-    if (existingData) {
-      let indexValue = `${teamIndex + 1}.${index + 1}:`;
-      let newValue = `${teamIndex + 1}.${index + 1}:${value}`;
-      const indexValueExists = existingData.value.split(',').find((item) => item.includes(indexValue)) ? true : false;
+      if (existingData) {
+        let indexValue = `${teamIndex + 1}.${index + 1}:`;
+        let newValue = `${teamIndex + 1}.${index + 1}:${value}`;
+        const indexValueExists = existingData.value.split(',').find((item) => item.includes(indexValue)) ? true : false;
 
-      if (indexValueExists) {
-        const oldValue = existingData.value.split(',').find((item) => item.includes(indexValue));
-        const updatedValue = existingData.value.replace(oldValue, newValue);
-        setFormSubmitData((prevData) => [
-          ...prevData.filter((item) => item.fieldId !== fieldId),
-          {
-            fieldId,
-            value: updatedValue,
-          },
-        ]);
-      } else {
-        setFormSubmitData((prevData) => [
-          ...prevData.filter((item) => item.fieldId !== fieldId),
-          {
-            fieldId,
-            value: `${existingData.value},${newValue}`,
-          },
-        ]);
+        if (indexValueExists) {
+          const oldValue = existingData.value.split(',').find((item) => item.includes(indexValue));
+          const updatedValue = existingData.value.replace(oldValue, newValue);
+          setFormSubmmitedData((prevData) => ({
+            ...prevData,
+            data: [
+              ...prevData.data.filter((item) => item.fieldId !== fieldId),
+              {
+                fieldId,
+                value: updatedValue,
+              },
+            ],
+          }));
+        } else {
+          setFormSubmmitedData((prevData) => ({
+            ...prevData,
+            data: [
+              ...prevData.data.filter((item) => item.fieldId !== fieldId),
+              {
+                fieldId,
+                value: `${existingData.value},${newValue}`,
+              },
+            ],
+          }));
+        }
+      }
+    } else {
+      const existingData = formSubmitData.find((item) => item.fieldId === fieldId);
+
+      if (existingData) {
+        let indexValue = `${teamIndex + 1}.${index + 1}:`;
+        let newValue = `${teamIndex + 1}.${index + 1}:${value}`;
+        const indexValueExists = existingData.value.split(',').find((item) => item.includes(indexValue)) ? true : false;
+
+        if (indexValueExists) {
+          const oldValue = existingData.value.split(',').find((item) => item.includes(indexValue));
+          const updatedValue = existingData.value.replace(oldValue, newValue);
+          setFormSubmitData((prevData) => [
+            ...prevData.filter((item) => item.fieldId !== fieldId),
+            {
+              fieldId,
+              value: updatedValue,
+            },
+          ]);
+        } else {
+          setFormSubmitData((prevData) => [
+            ...prevData.filter((item) => item.fieldId !== fieldId),
+            {
+              fieldId,
+              value: `${existingData.value},${newValue}`,
+            },
+          ]);
+        }
       }
     }
   };
 
   const handleAddSubNumberField = (teamIndex, minRequiredNames, maxRequiredNames, fieldId) => {
-    const existingData = numberOfSubFields.find((item) => {
-      if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
-        return item;
-      }
-    });
-
-    if (existingData) {
-      if (existingData.value >= maxRequiredNames) {
-        openNotificationWithIcon('error', 'خطأ', `لا يمكنك إضافة المزيد من الأسماء`);
-        return;
-      }
-
-      const updatedData = numberOfSubFields.map((item) => {
-        if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
-          return {
-            fieldId,
-            teamIndex,
-            value: existingData.value + 1,
-          };
+    if (submmitedAlready) {
+      const existingData = formSubmmitedData.data.find((item) => {
+        if (item.fieldId === fieldId) {
+          return item;
         }
-        return item;
       });
 
-      setNumberOfSubFields(updatedData);
+      if (existingData) {
+        if (existingData.value >= maxRequiredNames) {
+          openNotificationWithIcon('error', 'خطأ', `لا يمكنك إضافة المزيد من الأسماء`);
+          return;
+        }
+
+        const updatedData = formSubmmitedData.data.map((item) => {
+          if (item.fieldId === fieldId) {
+            return {
+              fieldId,
+              value: existingData.value + 1,
+            };
+          }
+          return item;
+        });
+
+        setFormSubmmitedData((prevData) => ({
+          ...prevData,
+          data: updatedData,
+        }));
+
+      } else {
+        setFormSubmmitedData((prevData) => ({
+          ...prevData,
+          data: [
+            ...prevData.data,
+            {
+              fieldId,
+              value: minRequiredNames + 1,
+            },
+          ],
+        }));
+      }
     } else {
-      setNumberOfSubFields((prevData) => [
-        ...prevData,
-        {
-          fieldId,
-          teamIndex,
-          value: minRequiredNames + 1,
-        },
-      ]);
-    }
+
+      const existingData = numberOfSubFields.find((item) => {
+        if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
+          return item;
+        }
+      });
+
+      if (existingData) {
+        if (existingData.value >= maxRequiredNames) {
+          openNotificationWithIcon('error', 'خطأ', `لا يمكنك إضافة المزيد من الأسماء`);
+          return;
+        }
+
+        const updatedData = numberOfSubFields.map((item) => {
+          if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
+            return {
+              fieldId,
+              teamIndex,
+              value: existingData.value + 1,
+            };
+          }
+          return item;
+        });
+
+        setNumberOfSubFields(updatedData);
+      } else {
+        setNumberOfSubFields((prevData) => [
+          ...prevData,
+          {
+            fieldId,
+            teamIndex,
+            value: minRequiredNames + 1,
+          },
+        ]);
+      }
+    };
   };
 
   // TODO: we need to update numberOfChoices to (maxNumberOfChoices) and (minNumberOfChoices) to handle the case of multiple choices
@@ -384,7 +561,7 @@ const FormSubmit = () => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-    const response = await updateSubmission(submitionId, formSubmmitedData.data, token);
+    const response = await updateSubmission(submitionId, formSubmmitedData.data, token, totalPrice);
     if (response.success) {
       openNotificationWithIcon('success', 'نجاح', 'تم تعديل النموذج بنجاح');
       setIsEditing(false);
@@ -407,17 +584,6 @@ const FormSubmit = () => {
   return (
     <>
       <Header churchData={churchData} />
-      {/* 
-        formFieldsData
-          fields:
-            name: name of the field
-            description: description of the field ( indeed it as a tooltip )
-            order: order of the field for sorting
-            isRequired: is the field required or not
-            isEnum: is the field an enum or not
-              numberOfChoices (if isEnum is true): number of choices
-              values (if isEnum is true): array of choices
-       */}
       {loading ? <Spinner /> :
         <MDBContainer style={{
           marginBottom: '5rem',
@@ -430,10 +596,6 @@ const FormSubmit = () => {
               {submmitedAlready ?
                 (
                   <>
-                    {/* here i need to show same inputs with same fields but with values and 2 buttons one for edit and one for delete
-                    formSubmmitedData.data -> value and fieldId
-                  */}
-                    {/* start */}
                     <div dir="rtl" className="mt-5">
                       {formFieldsData
                         .slice()
@@ -442,6 +604,7 @@ const FormSubmit = () => {
                           <div key={index} className="mb-3">
                             <label htmlFor={`field-${index}`} className="form-label">
                               {field.name}
+                              {field.ifNumber?.price && (<small> {field.ifNumber.price}{"x"} جنية</small>)}
                             </label>
                             <>
                               {field.isEnum ? (
@@ -501,27 +664,197 @@ const FormSubmit = () => {
                                 </>
                               ) : (
                                 <>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    id={`field-${index}`}
-                                    placeholder={field.description}
-                                    required={field.isRequired}
-                                    value={
-                                      formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value || ''
-                                    }
-                                    onChange={(e) => {
-                                      if (isEditing) {
-                                        handleInputChange(e, field._id);
+                                  {field.isNumber ? (
+                                    <>
+                                      <div style={{
+                                        display: 'flex',
+                                        gap: '2rem',
+                                        alignItems: 'center',
+                                      }}>
+                                        <input
+                                          type="number"
+                                          className="form-control"
+                                          id={`field-${index}`}
+                                          placeholder={field.description}
+                                          required={field.isRequired}
+                                          style={{
+                                            width: 'fit-content',
+                                          }}
+                                          value={
+                                            formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value.split(',')[0] || ''
+                                          }
+                                          onChange={(e) => {
+                                            if (isEditing) {
+                                              handleNumberFieldChange(e, field._id, field);
+                                            }
+                                          }}
+                                          max={field.ifNumber.maxNumber}
+                                          disabled={!isEditing}
+                                        />
+                                        <div style={{
+                                          color: "#005300",
+                                        }}>
+                                          {field.ifNumber.price && (
+                                            <>
+                                              {formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value.split(',')[0] ?
+                                                field.ifNumber.price * formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value.split(',')[0] : 0
+                                              } جنيه
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div style={{
+                                        // display: "flex",
+                                        // flexWrap: "wrap",
+                                      }}>
+                                        {field.ifNumber.maxRequiredNames !== 0 &&
+                                          formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value.split(',')[0] > 0 && (
+                                            <>
+                                              {Array.from(
+                                                Array(
+                                                  parseInt(
+                                                    formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value
+                                                      .split(',')[0],
+                                                    10
+                                                  )
+                                                ),
+                                                (_, teamIndex) => (
+                                                  <div key={teamIndex} style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: '1rem',
+                                                    margin: '1rem',
+                                                  }}>
+                                                    <span style={{
+                                                      color: 'rgba(0,0,0,.6)',
+                                                      marginBottom: '-10px',
+                                                    }}
+                                                    >{field.ifNumber.nameTitle} {teamIndex + 1} {" "}
+                                                      {formFieldsData.length > 1 && <small>({field.name})</small>}
+                                                    </span>
+                                                    <div
+                                                      style={{
+                                                        display: 'flex',
+                                                        flexDirection: 'row',
+                                                        flexWrap: 'wrap',
+                                                        alignItems: 'center',
+                                                        alignContent: 'center',
+                                                        gap: '2rem',
+                                                        justifyContent: 'flex-start',
+                                                      }}
+                                                    >
+                                                      {Array.from(
+                                                        Array(
+                                                          (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                            && item.fieldId === field._id
+                                                          )?.value)
+                                                          ||
+                                                          field.ifNumber.minRequiredNames
+                                                        ),
+                                                        (_, i) => (
+                                                          <div key={i}>
+                                                            <input
+                                                              type="text"
+                                                              className="form-control"
+                                                              placeholder=
+                                                              {
+                                                                (
+                                                                  (numberOfSubFields.find((item) => item.teamIndex === teamIndex
+                                                                    && item.fieldId === field._id
+                                                                  )?.value)
+                                                                  ||
+                                                                  field.ifNumber.minRequiredNames) > 1 ? (`ادخل اسم ${i + 1}`) : (`ادخل الاسم`)
+                                                              }
+                                                              value={
+                                                                formSubmmitedData.data.find((item) => item.fieldId === field._id)
+                                                                  ?.value.split(',')
+                                                                  .find((item) => item.includes(`${teamIndex + 1}.${i + 1}:`))
+                                                                  ?.split(':')[1] || ''
+                                                              }
+                                                              onChange={(e) =>
+                                                                handleSubNumberFieldChange(
+                                                                  e,
+                                                                  field._id,
+                                                                  i,
+                                                                  teamIndex
+                                                                )
+                                                              }
+                                                              disabled={!isEditing}
+                                                            />
+                                                          </div>
+                                                        )
+                                                      )}
+                                                    </div>
+                                                    {(
+                                                      (
+                                                        numberOfSubFields.find((item) => item.teamIndex === teamIndex &&
+                                                          item.fieldId === field._id)?.value ||
+                                                        field.ifNumber.minRequiredNames
+                                                      ) < field.ifNumber.maxRequiredNames ? (
+                                                        <Button
+                                                          onClick={() =>
+                                                            handleAddSubNumberField(
+                                                              teamIndex,
+                                                              field.ifNumber.minRequiredNames,
+                                                              field.ifNumber.maxRequiredNames,
+                                                              field._id
+                                                            )}
+                                                          style={{
+                                                            backgroundColor: '#004d00',
+                                                            color: 'white',
+                                                            width: '150px',
+                                                          }}
+                                                        >
+                                                          <FontAwesomeIcon icon={faAdd} />
+                                                        </Button>
+                                                      ) : null)}
+                                                  </div>
+                                                )
+                                              )}
+                                            </>
+                                          )}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      id={`field-${index}`}
+                                      placeholder={field.description}
+                                      required={field.isRequired}
+                                      value={
+                                        formSubmmitedData.data.find((item) => item.fieldId === field._id)?.value || ''
                                       }
-                                    }}
-                                    disabled={!isEditing}
-                                  />
+                                      onChange={(e) => {
+                                        if (isEditing) {
+                                          handleInputChange(e, field._id);
+                                        }
+                                      }}
+                                      disabled={!isEditing}
+                                    />
+                                  )}
                                 </>
                               )}
                             </>
                           </div>
                         ))}
+                      {totalPrice > 0 ? (
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginTop: '2rem',
+                          marginBottom: '2rem',
+                        }}>
+                          <span>السعر الإجمالي: {" "}
+                            <span style={{
+                              color: '#005300',
+                            }}>
+                              {totalPrice} جنيه
+                            </span>
+                          </span>
+                        </div>
+                      ) : null}
                       <div className="d-flex justify-content-center">
                         {isEditing ? (
                           <div
@@ -566,15 +899,13 @@ const FormSubmit = () => {
                         )}
                       </div>
                     </div>
-                    {/* end */}
                   </>
                 ) : (
                   <>
-                    {/* i dont need form to go anyware i wll handle it  */}
                     <form dir='rtl' onSubmit={handleSubmit} className="mt-5">
                       {formFieldsData
-                        .slice() // create a shallow copy to avoid mutating the original array
-                        .sort((a, b) => a.order - b.order) // sort by order
+                        .slice()
+                        .sort((a, b) => a.order - b.order)
                         .map((field, index) => (
                           <div key={index} className="mb-3">
                             <label htmlFor={`field-${`index`}`} className="form-label">

@@ -43,9 +43,9 @@ export const deleteSubmission = async (submissionId, token) => {
   }
 }
 
-export const updateSubmission = async (submissionId, allData, token) => {
+export const updateSubmission = async (submissionId, allData, token, totalPrice) => {
   try {
-    const response = await apiClient.put(`/form-submissions/update/${submissionId}`, { allData }, {
+    const response = await apiClient.put(`/form-submissions/update/${submissionId}`, { allData, totalPrice }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
