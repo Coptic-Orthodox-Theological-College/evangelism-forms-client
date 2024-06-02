@@ -1,11 +1,11 @@
 import apiClient from ".";
 
-export const submitForm = async (allData, formTemplateId, token) => {
+export const submitForm = async (allData, formTemplateId, token, totalPrice) => {
   try {
     const response = await apiClient
       .post(
         `/form-submissions/submit/${formTemplateId}`,
-        { allData },
+        { allData, totalPrice },
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -372,7 +372,7 @@ const FormSubmit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await submitForm(formSubmitData, FormTemplateId, token);
+    const response = await submitForm(formSubmitData, FormTemplateId, token, totalPrice);
     if (response.success) {
       openNotificationWithIcon('success', 'نجاح', 'تم تقديم النموذج بنجاح');
       navigate('/church');

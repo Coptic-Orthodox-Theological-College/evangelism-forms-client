@@ -212,7 +212,6 @@ body {
 }
 
 .editing {
-  background: #f0f0f0;
   border: black 1px solid;
   max-width: -moz-fit-content;
   max-width: fit-content;
