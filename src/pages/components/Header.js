@@ -16,7 +16,6 @@ import logo from '../../assets/logo.png';
 
 const Header = ({ churchData }) => {
   const navigate = useNavigate();
-  const [showNavbarSecondary, setShowNavbarSecondary] = useState(false);
   const [openNav, setOpenNav] = useState(false);
 
   const handleLogout = () => {
@@ -32,9 +31,13 @@ const Header = ({ churchData }) => {
   return (
     <MDBNavbar expand='lg' light bgColor='light' dir='rtl' >
       <MDBNavbarBrand>
-        <img src={logo} alt='logo' loading='lazy' className='logo-header' onClick={() => navigate('/home')} />
-        {churchData && (
+        <img src={logo} alt='logo' loading='lazy' className='logo-header' onClick={() => navigate('/home')} style={{
+          cursor: 'pointer',
+        }} />
+        {churchData ? (
           <MDBNavbarLink onClick={() => window.location.href = `/church`}>{churchData.name}</MDBNavbarLink>
+        ) : (
+          <MDBNavbarLink onClick={() => window.location.href = '/home'}>الرئيسية</MDBNavbarLink>
         )}
       </MDBNavbarBrand>
       <MDBNavbarToggler

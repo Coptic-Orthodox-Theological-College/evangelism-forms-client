@@ -13,11 +13,13 @@ export const getChurch = async (token) => {
   }
 }
 
-export const createChurch = async (name = '', address = '', token) => {
+export const createChurch = async (name = '', address = '', token, responsiblePerson = '', phone = '') => {
   try {
     const response = await apiClient.post("/churches/add", {
       name,
       address,
+      responsiblePerson,
+      phone,
     }, {
       headers: {
         Authorization: `Bearer ${token}`,

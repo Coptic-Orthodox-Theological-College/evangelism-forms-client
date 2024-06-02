@@ -2,18 +2,20 @@ import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import { MDBContainer, MDBRow, MDBCol } from "mdb-react-ui-kit";
 import { createChurch, getChurch } from "../apis/church";
-import { Modal } from "antd";
+import { Modal, Select } from "antd";
 import { openNotificationWithIcon } from "../utils/notification";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import WaveSvg from "./components/WaveSvg";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [showAddChurchPopup, setShowAddChurchPopup] = useState(false);
   const [churchData, setChurchData] = useState({});
   const [churchName, setChurchName] = useState("");
   const [address, setAddress] = useState("");
-  const navigate = useNavigate();
+  const [responsiblePerson, setResponsiblePerson] = useState("");
+  const [phone, setPhone] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -41,18 +43,24 @@ const Home = () => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
 
-    if (churchName === "" || address === "") {
+    if (churchName === "" || address === "" || responsiblePerson === "" || phone === "") {
       openNotificationWithIcon("error", "خطأ", "الرجاء ملء جميع الحقول");
       return;
     }
 
-    const response = await createChurch(churchName, address, token);
+    if (phone.length !== 11) {
+      openNotificationWithIcon("error", "خطأ", "رقم الهاتف يجب أن يكون 11 رقم");
+      return;
+    }
+
+    const response = await createChurch(churchName, address, token, responsiblePerson, phone);
     if (!response.success) {
       openNotificationWithIcon("error", "خطأ", response.message);
       return;
     }
     openNotificationWithIcon("success", "نجاح", "تم إضافة الكنيسة بنجاح");
     setShowAddChurchPopup(false);
+    window.location.href = "/";
   };
 
   const handleCancelPopup = () => {
@@ -171,10 +179,37 @@ const Home = () => {
             <input
               type="text"
               className="form-control"
-              placeholder="القطاع"
+              placeholder="الخادم المسؤول"
               required
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => setResponsiblePerson(e.target.value)}
             />
+            <input
+              type="text"
+              className="form-control"
+              placeholder="رقم الهاتف"
+              required
+              onChange={(e) => {
+                if (isNaN(e.target.value)) {
+                  return;
+                }
+                setPhone(e.target.value);
+              }}
+            />
+            <Select
+              placeholder="القطاع"
+              style={{
+                width: "100%",
+                fontFamily: 'Cairo',
+              }}
+              onChange={(value) => setAddress(value)}
+            >
+              <Select.Option value="شرق 1">شرق 1</Select.Option>
+              <Select.Option value="شرق 2">شرق 2</Select.Option>
+              <Select.Option value="غرب">غرب</Select.Option>
+              <Select.Option value="وسط">وسط</Select.Option>
+              <Select.Option value="منتزة 1">منتزة 1</Select.Option>
+              <Select.Option value="منتزة 2">منتزة 2</Select.Option>
+            </Select>
             <div style={{ display: "flex", gap: "1rem" }}>
               <button
                 type="submit"
@@ -192,7 +227,7 @@ const Home = () => {
               </button>
             </div>
           </form>
-        </Modal>
+        </Modal >
       )}
     </>
   );

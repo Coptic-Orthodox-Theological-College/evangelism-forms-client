@@ -81,16 +81,32 @@ const Login = () => {
             <div id="radius-shape-1" className="position-absolute rounded-circle shadow-5-strong"></div>
             <div id="radius-shape-2" className="position-absolute shadow-5-strong"></div>
             <MDBCard className='my-5 bg-glass'>
-              <MDBCardBody className='p-5'>
-                <img src='mainLogo.png' alt='logo' className='d-block mx-auto mb-4'
+              <MDBCardBody className='p-5' style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}>
+                <img src='mainLogo.png' alt='logo' className='d-block mb-4'
                   style={{
                     width: '300px',
                   }} />
                 <h4 className='text-center mb-4'>تسجيل الدخول</h4>
                 {username === '' && showErrors && <span className='sign-in-error-message'>الرجاء إدخال اسم المستخدم</span>}
-                <MDBInput wrapperClass='mb-4' label='اسم المستخدم' id='form1' type='text' onChange={handleUsernameChange} />
+                <MDBInput
+                  wrapperClass='mb-4'
+                  label='اسم المستخدم'
+                  id='form1'
+                  type='text'
+                  onChange={handleUsernameChange}
+                />
                 {password === '' && showErrors && <span className='sign-in-error-message'>الرجاء إدخال كلمة المرور</span>}
-                <MDBInput wrapperClass='mb-2' label='كلمة المرور' id='form2' type='password' onChange={handlePasswordChange} />
+                <MDBInput
+                  wrapperClass='mb-2'
+                  label='كلمة المرور'
+                  id='form2'
+                  type='password'
+                  onChange={handlePasswordChange}
+                />
                 <div dir='rtl' className='d-flex justify-content-center gap-2 mb-2'>
                   <MDBCheckbox id='checkbox1' onChange={handleRememberMeChange} />
                   <label className='form-check-label' htmlFor='checkbox1'>تذكرني</label>
