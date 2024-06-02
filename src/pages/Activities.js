@@ -38,7 +38,6 @@ const Activities = () => {
       }
       setAllActivities(response.activities);
       setLoading(false);
-      console.log("🚀 ~ response.activities:", response.activities)
     })();
   }, []);
 
