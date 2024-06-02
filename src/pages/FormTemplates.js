@@ -113,6 +113,7 @@ const FormTemplates = () => {
                             borderRadius: "0.5em",
                             width: "90%",
                             margin: "0 auto",
+                            marginTop: "8px",
                           }}>
                             {formTemplate.submttedBy?.filter((item) => item.userId === userId).length === 1 ?
                               "تم التقديم" :
@@ -182,9 +183,6 @@ const FormTemplates = () => {
                           onClick={() => {
                             navigate(`/form-submit/${selectedFormTemplate._id}?submitionId=${submition.submissionId}`)
                           }}>
-                          #
-                          {index + 1}
-                          {" "}
                           تم التقديم فى تاريخ:
                           {" "}
                           {new Date(submition.submittedAt).toLocaleDateString()}
@@ -199,7 +197,6 @@ const FormTemplates = () => {
                         >
                           <FontAwesomeIcon icon={faPen} />
                         </Button>
-                        {/* TODO: Add delete submition */}
                         <Button onClick={
                           () => {
                             setShowDeleteModal(true);
@@ -212,12 +209,12 @@ const FormTemplates = () => {
                       </div>
                     </div>
                   ))}
-                  <button
+                  {/* <button
                     className="btn btn-primary"
                     onClick={() => { navigate(`/form-submit/${selectedFormTemplate._id}`) }}
                   >
                     إضافة جديد
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </Modal>
