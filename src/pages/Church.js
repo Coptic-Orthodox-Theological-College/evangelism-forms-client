@@ -229,14 +229,16 @@ const Church = () => {
                         <h3>
                           {formName}
                           {" "}
-                          {groupedSubmissions[activityName][formName][0].totalPrice && (
-                            <small style={{
-                              color: '#005300',
-                              fontSize: '1rem',
-                            }}>{groupedSubmissions[activityName][formName][0].totalPrice} جنية</small>
-                          )}
+                          <small style={{
+                            color: '#005300',
+                            fontSize: '1rem',
+                          }}>{groupedSubmissions[activityName][formName].map(submission => submission.totalPrice).reduce((acc, price) => acc + price, 0)} جنية</small>
                         </h3>
-                        <MDBRow>
+                        <MDBRow style={{
+                          display: 'flex',
+                          gap: '0.8rem',
+                          flexDirection: 'column',
+                        }}>
                           {groupedSubmissions[activityName][formName].map((submission, index) => {
                             return (
                               <MDBCol key={index} dir='rtl'>
