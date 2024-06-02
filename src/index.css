@@ -74,6 +74,7 @@ body {
   justify-content: center;
   height: 100vh;
   background-color: #eee;
+  overflow: hidden;
 }
 
 .custom-container-card {
@@ -89,7 +90,6 @@ body {
 .sign-in-error-message {
   color: red;
   font-size: 12px;
-  position: absolute;
   margin-top: -20px;
 }
 
@@ -212,11 +212,11 @@ body {
 }
 
 .editing {
-  background: #8400ff;
-  /* box-shadow: -2px 0px 0px #0081C6; */
+  background: #f0f0f0;
   border: black 1px solid;
+  max-width: -moz-fit-content;
   max-width: fit-content;
-  padding: 0.5rem;
+  padding: 0 0.5rem;
   border-radius: 10px;
 }
 
@@ -391,4 +391,8 @@ section {
   35% {
     transform: scale3D(0, 0, 1);
   }
+}
+
+.form-outline .form-control ~ .form-label {
+  padding-top: 0px !important;
 }
