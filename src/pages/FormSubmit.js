@@ -70,6 +70,26 @@ const FormSubmit = () => {
   }, [submitionId]);
 
   useEffect(() => {
+    if (submmitedAlready && formSubmmitedData.data?.length > 0 && numberOfSubFields.length === 0) {
+      const numberOfFields = formSubmmitedData.data?.length;
+      for (let i = 0; i < numberOfFields; i++) {
+        const numberOfTeams = formSubmmitedData.data[i].value.split(',')[0];
+        for (let j = 0; j < numberOfTeams; j++) {
+          const subFields = formSubmmitedData.data[i].value.split(',').filter((item) => item.includes(`${j + 1}.`)).length;
+          setNumberOfSubFields((prevData) => [
+            ...prevData,
+            {
+              fieldId: formSubmmitedData.data[i].fieldId,
+              teamIndex: j,
+              value: subFields,
+            },
+          ]);
+        }
+      }
+    }
+  }, [submmitedAlready]);
+
+  useEffect(() => {
     const handleTotalPrice = () => {
       let totalPriceValue = 0;
       if (submmitedAlready) {
@@ -208,6 +228,15 @@ const FormSubmit = () => {
             ]
           }));
         }
+      } else {
+        const newObject = {
+          fieldId,
+          value: `${numericValue}`
+        };
+        setFormSubmmitedData((prevData) => ({
+          ...prevData,
+          data: [...prevData.data, newObject]
+        }));
       }
     } else {
       if (!isNaN(numericValue)) {
@@ -344,8 +373,8 @@ const FormSubmit = () => {
 
   const handleAddSubNumberField = (teamIndex, minRequiredNames, maxRequiredNames, fieldId) => {
     if (submmitedAlready) {
-      const existingData = formSubmmitedData.data.find((item) => {
-        if (item.fieldId === fieldId) {
+      const existingData = numberOfSubFields.find((item) => {
+        if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
           return item;
         }
       });
@@ -356,35 +385,29 @@ const FormSubmit = () => {
           return;
         }
 
-        const updatedData = formSubmmitedData.data.map((item) => {
-          if (item.fieldId === fieldId) {
+        const updatedData = numberOfSubFields.map((item) => {
+          if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
             return {
               fieldId,
+              teamIndex,
               value: existingData.value + 1,
             };
           }
           return item;
         });
 
-        setFormSubmmitedData((prevData) => ({
-          ...prevData,
-          data: updatedData,
-        }));
-
+        setNumberOfSubFields(updatedData);
       } else {
-        setFormSubmmitedData((prevData) => ({
+        setNumberOfSubFields((prevData) => [
           ...prevData,
-          data: [
-            ...prevData.data,
-            {
-              fieldId,
-              value: minRequiredNames + 1,
-            },
-          ],
-        }));
+          {
+            fieldId,
+            teamIndex,
+            value: minRequiredNames + 1,
+          },
+        ]);
       }
     } else {
-
       const existingData = numberOfSubFields.find((item) => {
         if (item.teamIndex === teamIndex && item.fieldId === fieldId) {
           return item;
@@ -804,6 +827,7 @@ const FormSubmit = () => {
                                                             color: 'white',
                                                             width: '150px',
                                                           }}
+                                                          disabled={submmitedAlready ? !isEditing : false}
                                                         >
                                                           <FontAwesomeIcon icon={faAdd} />
                                                         </Button>
