@@ -81,7 +81,7 @@ const Church = () => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSubmition, setSelectedSubmition] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -95,27 +95,32 @@ const Church = () => {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const response = await getChurch(token);
       if (!response.success) {
         openNotificationWithIcon("error", "Error", response.message);
         return;
       }
       setChurchData(response.church);
+      setLoading(false);
     })();
   }, [token]);
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const response = await getAllChurchSubbmissions(token);
       if (!response.success) {
         openNotificationWithIcon("error", "Error", response.message);
         return;
       }
       setAllSubmissions(response.submissions);
+      setLoading(false);
     })();
   }, [token]);
 
   useEffect(() => {
+    setLoading(true);
     let allSubbmissionsTotalPriceData = 0;
     const groupedSubmissionsData = allSubmissions.reduce((acc, submission) => {
       if (!acc[submission.formTemplateId.activityId.name]) {
