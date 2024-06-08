@@ -53,10 +53,7 @@ const Header = ({ churchData }) => {
       }}>
         <MDBNavbarNav>
           <MDBNavbarItem>
-            <MDBNavbarLink href='#'>من نحن</MDBNavbarLink>
-          </MDBNavbarItem>
-          <MDBNavbarItem>
-            <MDBNavbarLink href='#'>خدماتنا</MDBNavbarLink>
+            <MDBNavbarLink onClick={() => navigate('/all-activities')}>الاشتراك فى المهرجان</MDBNavbarLink>
           </MDBNavbarItem>
           <MDBNavbarItem>
             <MDBNavbarLink href='#'>تواصل معنا</MDBNavbarLink>
