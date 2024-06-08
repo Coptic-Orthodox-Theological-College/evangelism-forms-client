@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { deleteSubmission } from "../apis/formSubmit";
+import Spinner from "./components/Spinner";
 
 function EditableField({ initialValue, name }) {
   const [count, setCount] = useState(0);
@@ -80,6 +81,7 @@ const Church = () => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSubmition, setSelectedSubmition] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -128,6 +130,7 @@ const Church = () => {
     }, {});
     setGroupedSubmissions(groupedSubmissionsData);
     setAllSubbmissionsTotalPrice(allSubbmissionsTotalPriceData);
+    setLoading(false);
   }, [allSubmissions]);
 
   const handelDeleteSubmition = (submissionId) => async () => {
@@ -145,207 +148,213 @@ const Church = () => {
   return (
     <>
       <Header />
-      <MDBContainer className="mt-5" style={{
-        marginBottom: '5rem',
-      }}>
-        <h1 className="text-center mt-5 mb-5">
-          معلومات الكنيسة
-        </h1>
-        <MDBRow>
-          <MDBCol dir='rtl'>
-            {churchData && (
-              <>
-                <div style={{
-                  fontSize: '1.2rem',
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                  }}>
-                    الاسم:
-                    <EditableField initialValue={churchData.name} name="name" />
-                  </div>
-                  <br />
-                  <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                  }}>
-                    قطاع:
-                    <EditableField initialValue={churchData.address} name="address" />
-                  </div>
-                  <br />
-                  <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                  }}>
-                    المسؤول:
-                    <EditableField initialValue={churchData.responsiblePerson} name="responsiblePerson" />
-                  </div>
-                  <br />
-                  <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                  }}>
-                    الهاتف:
-                    <EditableField initialValue={churchData.phone} name="phone" />
-                  </div>
-                </div>
-              </>
-            )}
-          </MDBCol>
-        </MDBRow >
-
-        <hr className="my-5" style={{
-          border: '1px solid #000',
-        }} />
-
-        <MDBRow style={
-          {
-            display: 'flex',
-            gap: '2rem',
-            flexWrap: 'wrap',
-            flexDirection: 'column',
-          }
-        }>
-          {groupedSubmissions && Object.keys(groupedSubmissions).map((activityName, index) => {
-            return (
-              <MDBCol key={index} dir='rtl'>
-                <h2>{activityName}</h2>
-                {/* line */}
-                <hr style={{
-                  width: '80%',
-                }} />
-                <MDBRow
-                  style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    flexWrap: 'wrap',
-                    flexDirection: 'column',
-                  }}
-                >
-                  {Object.keys(groupedSubmissions[activityName]).map((formName, index) => {
-                    return (
-                      <MDBCol key={index} dir='rtl'>
-                        <h3>
-                          {formName}
-                          {" "}
-                          <small style={{
-                            color: '#005300',
-                            fontSize: '1rem',
-                          }}>{groupedSubmissions[activityName][formName].map(submission => submission.totalPrice).reduce((acc, price) => acc + price, 0)} جنية</small>
-                        </h3>
-                        <MDBRow style={{
-                          display: 'flex',
-                          gap: '0.8rem',
-                          flexDirection: 'column',
-                        }}>
-                          {groupedSubmissions[activityName][formName].map((submission, index) => {
-                            return (
-                              <MDBCol key={index} dir='rtl'>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    gap: "1rem",
-                                    width: "100%",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      fontSize: '1.1rem',
-                                    }}
-                                  >تم التقديم في: {new Date(submission.createdAt).toLocaleString().replace(',', '')}</span>
-                                  <Button onClick={() =>
-                                    navigate(`/form-submit/${submission.formTemplateId
-                                      ._id}?submitionId=${submission._id}`)}
-                                  >
-                                    <FontAwesomeIcon icon={faPen} />
-                                  </Button>
-                                  {/* TODO: Add delete submition */}
-                                  <Button onClick={
-                                    () => {
-                                      setShowDeleteModal(true);
-                                      setSelectedSubmition(submission._id);
-                                    }
-                                  } danger>
-                                    <FontAwesomeIcon icon={faTrash} />
-                                  </Button>
-                                </div>
-                              </MDBCol>
-                            );
-                          })}
-                        </MDBRow>
-                      </MDBCol>
-                    );
-                  })}
-                </MDBRow>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <>
+          <MDBContainer className="mt-5" style={{
+            marginBottom: '5rem',
+          }}>
+            <h1 className="text-center mt-5 mb-5">
+              معلومات الكنيسة
+            </h1>
+            <MDBRow>
+              <MDBCol dir='rtl'>
+                {churchData && (
+                  <>
+                    <div style={{
+                      fontSize: '1.2rem',
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                      }}>
+                        الاسم:
+                        <EditableField initialValue={churchData.name} name="name" />
+                      </div>
+                      <br />
+                      <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                      }}>
+                        قطاع:
+                        <EditableField initialValue={churchData.address} name="address" />
+                      </div>
+                      <br />
+                      <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                      }}>
+                        المسؤول:
+                        <EditableField initialValue={churchData.responsiblePerson} name="responsiblePerson" />
+                      </div>
+                      <br />
+                      <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                      }}>
+                        الهاتف:
+                        <EditableField initialValue={churchData.phone} name="phone" />
+                      </div>
+                    </div>
+                  </>
+                )}
               </MDBCol>
-            );
-          })}
+            </MDBRow >
 
-          {allSubbmissionsTotalPrice > 0 && (
-            <MDBCol dir='rtl' style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              // border top and bottom
-              borderTop: '1px solid #005300',
-              borderBottom: '1px solid #005300',
-            }}>
-              <h3
-                style={{
-                  marginTop: '0.5rem',
-                }}
-              >الملغ الكلي:
-                {" "}
-                <span style={{
-                  color: '#005300',
+            <hr className="my-5" style={{
+              border: '1px solid #000',
+            }} />
+
+            <MDBRow style={
+              {
+                display: 'flex',
+                gap: '2rem',
+                flexWrap: 'wrap',
+                flexDirection: 'column',
+              }
+            }>
+              {groupedSubmissions && Object.keys(groupedSubmissions).map((activityName, index) => {
+                return (
+                  <MDBCol key={index} dir='rtl'>
+                    <h2>{activityName}</h2>
+                    {/* line */}
+                    <hr style={{
+                      width: '80%',
+                    }} />
+                    <MDBRow
+                      style={{
+                        display: 'flex',
+                        gap: '1rem',
+                        flexWrap: 'wrap',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {Object.keys(groupedSubmissions[activityName]).map((formName, index) => {
+                        return (
+                          <MDBCol key={index} dir='rtl'>
+                            <h3>
+                              {formName}
+                              {" "}
+                              <small style={{
+                                color: '#005300',
+                                fontSize: '1rem',
+                              }}>{groupedSubmissions[activityName][formName].map(submission => submission.totalPrice).reduce((acc, price) => acc + price, 0)} جنية</small>
+                            </h3>
+                            <MDBRow style={{
+                              display: 'flex',
+                              gap: '0.8rem',
+                              flexDirection: 'column',
+                            }}>
+                              {groupedSubmissions[activityName][formName].map((submission, index) => {
+                                return (
+                                  <MDBCol key={index} dir='rtl'>
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        gap: "1rem",
+                                        width: "100%",
+                                        alignItems: "center"
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          fontSize: '1.1rem',
+                                        }}
+                                      >تم التقديم في: {new Date(submission.createdAt).toLocaleString().replace(',', '')}</span>
+                                      <Button onClick={() =>
+                                        navigate(`/form-submit/${submission.formTemplateId
+                                          ._id}?submitionId=${submission._id}`)}
+                                      >
+                                        <FontAwesomeIcon icon={faPen} />
+                                      </Button>
+                                      {/* TODO: Add delete submition */}
+                                      <Button onClick={
+                                        () => {
+                                          setShowDeleteModal(true);
+                                          setSelectedSubmition(submission._id);
+                                        }
+                                      } danger>
+                                        <FontAwesomeIcon icon={faTrash} />
+                                      </Button>
+                                    </div>
+                                  </MDBCol>
+                                );
+                              })}
+                            </MDBRow>
+                          </MDBCol>
+                        );
+                      })}
+                    </MDBRow>
+                  </MDBCol>
+                );
+              })}
+
+              {allSubbmissionsTotalPrice > 0 && (
+                <MDBCol dir='rtl' style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  // border top and bottom
+                  borderTop: '1px solid #005300',
+                  borderBottom: '1px solid #005300',
                 }}>
-                  {allSubbmissionsTotalPrice} جنية
-                </span>
-              </h3>
-            </MDBCol>
-          )}
-        </MDBRow >
+                  <h3
+                    style={{
+                      marginTop: '0.5rem',
+                    }}
+                  >الملغ الكلي:
+                    {" "}
+                    <span style={{
+                      color: '#005300',
+                    }}>
+                      {allSubbmissionsTotalPrice} جنية
+                    </span>
+                  </h3>
+                </MDBCol>
+              )}
+            </MDBRow >
 
-      </MDBContainer >
-      {showDeleteModal && (
-        <Modal
-          open={showDeleteModal}
-          footer={null}
-          onCancel={() => setShowDeleteModal(false)}
-          style={{
-            direction: "rtl",
-            textAlign: "center",
-            fontFamily: "Cairo",
-            fontSize: "1.5rem",
-            minWidth: "fit-content",
-            margin: "0 auto",
-          }}
-        >
-          <h4>هل تريد حذف هذا التقديم ؟</h4>
-          <div
-            style={{
-              padding: "1rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "1rem",
-            }}
-          >
-            <Button
-              onClick={handelDeleteSubmition(selectedSubmition)}
-              danger
+          </MDBContainer >
+          {showDeleteModal && (
+            <Modal
+              open={showDeleteModal}
+              footer={null}
+              onCancel={() => setShowDeleteModal(false)}
+              style={{
+                direction: "rtl",
+                textAlign: "center",
+                fontFamily: "Cairo",
+                fontSize: "1.5rem",
+                minWidth: "fit-content",
+                margin: "0 auto",
+              }}
             >
-              نعم
-            </Button>
-            <Button
-              onClick={() => setShowDeleteModal(false)}
-            >
-              لا
-            </Button>
-          </div>
-        </Modal>
+              <h4>هل تريد حذف هذا التقديم ؟</h4>
+              <div
+                style={{
+                  padding: "1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "1rem",
+                }}
+              >
+                <Button
+                  onClick={handelDeleteSubmition(selectedSubmition)}
+                  danger
+                >
+                  نعم
+                </Button>
+                <Button
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  لا
+                </Button>
+              </div>
+            </Modal>
+          )}
+        </>
       )}
     </>
   );
