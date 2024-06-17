@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">evangelism-forms-client</string>
+    <string name="title_activity_main">evangelism-forms-client</string>
+    <string name="package_name">elamana.online</string>
+    <string name="custom_url_scheme">elamana.online</string>
+</resources>
